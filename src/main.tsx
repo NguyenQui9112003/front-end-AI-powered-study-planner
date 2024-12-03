@@ -9,12 +9,13 @@ import { Error } from './components/common/error';
 import { ImageDetail } from './components/features/photo/imageDetail';
 import { AuthProvider } from './helpers/context/authProvider';
 import { ProfilePage } from './pages/profilePage';
+import PrivateRoute from './helpers/privateRoute'
 
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <Navigate to="/home" replace />,
+      element: <Navigate to="/signIn" replace />,
       errorElement: <Error />,
     },
     {
@@ -29,7 +30,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/home",
-      element: <App />,
+      element: <PrivateRoute element={<App />} />,
       errorElement: <Error />,
     },
     {
