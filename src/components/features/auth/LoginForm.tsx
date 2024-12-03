@@ -4,13 +4,20 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useForm, SubmitHandler } from "react-hook-form"
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../../../helpers/context/authProvider";
+import { useGoogleLogin } from "../../../helpers/logInGoogle";
+
 
 export const LoginForm = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
+    const logInGoogle = useGoogleLogin();
 
     const navigateToRegister = () => {
         navigate(`/register`)
+    }
+
+    const handleLogInGooglge = () => {
+        logInGoogle();
     }
 
     type Inputs = {
@@ -103,6 +110,10 @@ export const LoginForm = () => {
                         </a>
                     </div>
                 </form>
+                
+                <button className="w-full mb-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleLogInGooglge}>
+                    Sign In with Google
+                </button>
 
                 <p className="text-center text-gray-500 text-xs">&copy;2020 Acme Corp. All rights reserved.</p>
             </div>
