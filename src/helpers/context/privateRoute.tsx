@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../helpers/context/authProvider';
+import { useAuth } from './authProvider';
 
 interface PrivateRouteProps {
     element: ReactNode;

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './context/authProvider';
-import app from './firebaseConfig';
+import { useAuth } from '../../../helpers/context/authProvider';
+import app from '../../../config/firebaseConfig';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 export const useGoogleLogin = () => {
@@ -16,7 +16,7 @@ export const useGoogleLogin = () => {
             const user = result.user;
             const idToken = await user.getIdToken();
 
-            let response = await fetch('https://be-ai-study-planner.onrender.com/auth/google', {
+            let response = await fetch('http://localhost:3000/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken }),

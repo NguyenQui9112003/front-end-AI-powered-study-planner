@@ -10,7 +10,7 @@ export const useRefreshToken = () => {
         }
 
         try {
-            const response = await fetch('https://be-ai-study-planner.onrender.com/auth/refresh-token', {
+            const response = await fetch('http://localhost:3000/auth/refresh-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

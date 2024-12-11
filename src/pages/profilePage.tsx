@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useRefreshToken } from '../helpers/refreshToken';
+import { useRefreshToken } from '../helpers/utility/refreshToken';
 
 export const ProfilePage = () => {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ export const ProfilePage = () => {
             let refresh_token = parsedToken.refresh_token;
 
             try {
-                let response = await fetch('https://be-ai-study-planner.onrender.com/auth/profile', {
+                let response = await fetch('http://localhost:3000/auth/profile', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
@@ -32,7 +32,7 @@ export const ProfilePage = () => {
                 } else if (response.status === 419) {
                     accessToken = await refreshToken(refresh_token);
                     if (accessToken) {
-                        response = await fetch('https://be-ai-study-planner.onrender.com/auth/profile', {
+                        response = await fetch('http://localhost:3000/auth/profile', {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${accessToken}`

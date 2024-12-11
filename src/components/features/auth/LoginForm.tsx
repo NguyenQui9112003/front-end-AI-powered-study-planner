@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useForm, SubmitHandler } from "react-hook-form"
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../../../helpers/context/authProvider";
-import { useGoogleLogin } from "../../../helpers/logInGoogle";
+import { useGoogleLogin } from "./LoginGoogleForm";
 
 
 export const LoginForm = () => {
@@ -30,11 +30,11 @@ export const LoginForm = () => {
         handleSubmit,
         reset,
         formState: { errors, isSubmitSuccessful },
-    } = useForm < Inputs > ()
+    } = useForm<Inputs>()
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            const response = await fetch('https://be-ai-study-planner.onrender.com/auth/login', {
+            const response = await fetch('http://localhost:3000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -110,7 +110,7 @@ export const LoginForm = () => {
                         </a>
                     </div>
                 </form>
-                
+
                 <button className="w-full mb-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleLogInGooglge}>
                     Sign In with Google
                 </button>

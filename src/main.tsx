@@ -9,7 +9,7 @@ import { Error } from './components/common/error';
 import { ImageDetail } from './components/features/photo/imageDetail';
 import { AuthProvider } from './helpers/context/authProvider';
 import { ProfilePage } from './pages/profilePage';
-import PrivateRoute from './helpers/privateRoute'
+import PrivateRoute from './helpers/context/privateRoute'
 
 const router = createBrowserRouter(
   [
