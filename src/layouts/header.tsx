@@ -23,59 +23,60 @@ export const Header = () => {
 
     return (
         <>
-            <nav className="bg-gray-800 mb-3">
-                <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <nav className="bg-blue-700 mb-3">
+                <div className="mx-auto max-w-full px-2 sm:px-6 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
                         <div className="flex flex-1 items-center justify-start">
-                            <div className="flex shrink-0 items-center">
+                            <span className="flex shrink-0 items-center">
                                 <img
                                     className="h-8 w-auto"
-                                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                                    alt="Your Company"
+                                    src=""
+                                    alt="Logo"
                                 />
-                            </div>
+                            </span>
                             <div className="ml-6 block">
                                 <div className="flex space-x-4">
                                     <a
                                         href="#"
-                                        className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                                        className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
                                         aria-current="page"
+                                    >
+                                        Home
+                                    </a>
+                                    <a
+                                        href="/task-management"
+                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    >
+                                        Task Management
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
                                     >
                                         Dashboard
                                     </a>
                                     <a
                                         href="#"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
                                     >
-                                        Team
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                                    >
-                                        Projects
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                                    >
-                                        Calendar
+                                        Timer
                                     </a>
                                 </div>
                             </div>
                         </div>
+
                         <div className="relative flex items-center pr-2">
                             <button
                                 type="button"
-                                className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                className="rounded-full p-1 text-white hover:text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-white"
                             >
                                 <span className="sr-only">View notifications</span>
                                 <svg
                                     className="h-6 w-6"
-                                    fill="none"
+                                    fill="currentColor"
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
-                                    stroke="currentColor"
+                                    stroke="none"
                                     aria-hidden="true"
                                 >
                                     <path
@@ -86,11 +87,11 @@ export const Header = () => {
                                 </svg>
                             </button>
 
-                            <div className="relative ml-3">
+                            <div className="relative ml-7">
                                 <div>
                                     <button
                                         type="button"
-                                        className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                        className="flex"
                                         id="user-menu-button"
                                         aria-expanded={isDropdownOpen}
                                         aria-haspopup="true"
@@ -98,9 +99,9 @@ export const Header = () => {
                                     >
                                         <span className="sr-only">Open user menu</span>
                                         <img
-                                            className="h-8 w-8 rounded-full"
-                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                            alt=""
+                                            className="h-8 w-8"
+                                            src=""
+                                            alt="avatar"
                                         />
                                     </button>
                                 </div>

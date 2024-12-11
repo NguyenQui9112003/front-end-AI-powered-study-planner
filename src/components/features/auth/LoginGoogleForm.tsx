@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './context/authProvider';
-import app from './firebaseConfig';
+import { useAuth } from '../../../helpers/context/authProvider';
+import app from '../../../config/firebaseConfig';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 export const useGoogleLogin = () => {

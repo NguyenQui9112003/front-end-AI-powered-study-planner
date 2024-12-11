@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useRefreshToken } from '../helpers/refreshToken';
+import { useRefreshToken } from '../helpers/utility/refreshToken';
 
 export const ProfilePage = () => {
     const navigate = useNavigate();
