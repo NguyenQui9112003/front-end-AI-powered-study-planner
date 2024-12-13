@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../helpers/context/authProvider';
 import { useState } from 'react';
 
@@ -23,7 +23,7 @@ export const Header = () => {
 
     return (
         <>
-            <nav className="bg-blue-700 mb-3">
+            <nav className="bg-blue-600">
                 <div className="mx-auto max-w-full px-2 sm:px-6 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
                         <div className="flex flex-1 items-center justify-start">
@@ -36,31 +36,47 @@ export const Header = () => {
                             </span>
                             <div className="ml-6 block">
                                 <div className="flex space-x-4">
-                                    <a
-                                        href="#"
-                                        className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    <NavLink
+                                        to="/home"
+                                        className={({ isActive }) =>
+                                            isActive
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                        }
                                         aria-current="page"
                                     >
                                         Home
-                                    </a>
-                                    <a
-                                        href="/task-management"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    </NavLink>
+                                    <NavLink
+                                        to="/task-management"
+                                        className={({ isActive }) =>
+                                            isActive
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                        }
                                     >
                                         Task Management
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    </NavLink>
+                                    <NavLink
+                                        to="/dashboard"
+                                        className={({ isActive }) =>
+                                            isActive
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                        }
                                     >
                                         Dashboard
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    </NavLink>
+                                    <NavLink
+                                        to="/timer"
+                                        className={({ isActive }) =>
+                                            isActive
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                        }
                                     >
                                         Timer
-                                    </a>
+                                    </NavLink>
                                 </div>
                             </div>
                         </div>

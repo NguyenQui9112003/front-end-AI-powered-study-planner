@@ -8,6 +8,7 @@ import { LoginForm } from './components/features/auth/LoginForm';
 import { Error } from './components/common/error';
 import { AuthProvider } from './helpers/context/authProvider';
 import { ProfilePage } from './pages/profilePage';
+import { TaskManagementPage } from './pages/task-management-list';
 import PrivateRoute from './helpers/context/privateRoute'
 
 const router = createBrowserRouter(
@@ -30,6 +31,11 @@ const router = createBrowserRouter(
     {
       path: "/home",
       element: <PrivateRoute element={<App />} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/task-management",
+      element: <PrivateRoute element={<TaskManagementPage />} />,
       errorElement: <Error />,
     },
     {

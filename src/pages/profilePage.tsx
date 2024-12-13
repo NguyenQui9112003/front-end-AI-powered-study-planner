@@ -4,7 +4,7 @@ import { useRefreshToken } from '../helpers/utility/refreshToken';
 
 export const ProfilePage = () => {
     const navigate = useNavigate();
-    const refreshToken = useRefreshToken();
+    const getRefreshToken = useRefreshToken();
     const [username, setUsername] = useState(null);
 
     useEffect(() => {
@@ -30,7 +30,7 @@ export const ProfilePage = () => {
                     const data = await response.json();
                     setUsername(data.username);
                 } else if (response.status === 419) {
-                    accessToken = await refreshToken(refresh_token);
+                    accessToken = await getRefreshToken(refresh_token);
                     if (accessToken) {
                         response = await fetch('http://localhost:3000/auth/profile', {
                             method: 'GET',
