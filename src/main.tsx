@@ -8,7 +8,7 @@ import { LoginForm } from './components/features/auth/LoginForm';
 import { Error } from './components/common/error';
 import { AuthProvider } from './helpers/context/authProvider';
 import { ProfilePage } from './pages/profilePage';
-import { TaskManagementPage } from './pages/task-management-list';
+import { TaskManagementPage } from './pages/taskManagementPage';
 import PrivateRoute from './helpers/context/privateRoute'
 
 const router = createBrowserRouter(
