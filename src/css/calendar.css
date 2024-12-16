@@ -2,9 +2,10 @@
     border-radius: 5px;
   }
   /* event inside calendar */
-  .fc-event {
-    background-color: #3788d8;
-    color: white;
+  .fc-event, .fc-daygrid-event-harness {
+    background-color: rgba(0, 0, 0, 0);
+    /* color: white; */
+    border: none;
   }
   .draggable-item {
     background-color: #3788d8;
@@ -37,12 +38,7 @@
     align-items: center; /* Optional: vertically aligns items */
     gap: 10px; /* Adds spacing between divs */
   }
-  .expired {
-    background-color: red;
-  }
-  .todo {
-    background-color: #3788d8;
-  }
+  
   .calendar-container {
     flex: 3;
     padding: 10px;
@@ -66,5 +62,18 @@
   }
   .draggable-item {
     padding: 8px;
+  }
+  .task-item {
+    padding: 3px 5px;
+    margin: 1px;
+    border: ;
+  }
+  .expired {
+    background-color: red;
+    border-radius: 5px;
+  }
+  .todo {
+    background-color: #3788d8;
+    border-radius: 5px;
   }
   
