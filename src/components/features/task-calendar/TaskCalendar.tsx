@@ -63,7 +63,7 @@ const TaskCalendar: React.FC = () => {
   const renderEventContent = (eventInfo: any) => {
     console.log(JSON.stringify(eventInfo, null, 2));
     const isExpired =
-      new Date(eventInfo.event.start) < new Date() ? "expired" : "todo";
+      new Date(eventInfo.event.end) < new Date() ? "expired" : "todo";
 
     return (
       <div className={`task-item ${isExpired}`}>
