@@ -1,6 +1,5 @@
 // npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/list @fullcalendar/timegrid @fullcalendar/interaction
 // fullcalendar.io/docs
-
 import React, { useState, useEffect } from "react";
 import FullCalendar, { EventInput } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -17,8 +16,8 @@ interface Event {
   end: string;
   state: string;
 }
+
 const TaskCalendar: React.FC = () => {
-  // State for holding events
   const [events, setEvents] = useState<Event[]>([]);
 
   // Initialize Draggable once the component is mounted
@@ -27,48 +26,78 @@ const TaskCalendar: React.FC = () => {
     if (containerEl) {
       new Draggable(containerEl, {
         itemSelector: ".draggable-item",
-        eventData: (eventEl) => {
-          return {
-            id: eventEl.innerText.trim(),
-            title: eventEl.innerText.trim(),
-          };
-        },
+        // eventData: (eventEl) => ({
+        //   id: `event-${eventEl.innerText.trim()}`,
+        //   title: eventEl.innerText.trim(),
+        // }),
       });
     }
   }, []);
 
-  // Event handler for dropping events
-  const handleEventandleEventDragDrop = (info: any) => {
-    // console.log(info);
+  // Handle drag-and-drop events
+  const handleEventDragDrop = (info: any) => {
+    console.log("handleEventDragDrop");
     const isExpired = new Date(info.date) < new Date();
 
     const newEvent: EventInput = {
+      id: `event-${info.draggedEl.innerText}`, // Unique ID for the event
       title: info.draggedEl.innerText,
       start: info.dateStr,
       state: isExpired ? "expired" : "todo",
     };
-    // console.log(newEvent);
-    // console.log(events);
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
-    info.draggedEl.remove(); // Remove from external list after dropping
-  };
 
-  // Generate task items dynamically
+    setEvents((prevEvents) => {
+      if (
+        prevEvents.some(
+          (event) =>
+            event.title === newEvent.title && event.start === newEvent.start
+        )
+      ) {
+        return prevEvents;
+      }
+      return [...prevEvents, newEvent];
+    });
+    info.draggedEl.remove(); // Remove the task from the taskbar
+    // console.log(events);
+  };
+  const handleEventResize = (info: any) => {
+    console.log("handleEventResize");
+
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === info.event.id
+          ? {
+              ...event,
+              start: info.event.start.toISOString(), // Update start time
+              end: info.event.end?.toISOString() || null, // Update end time (null if no end)
+            }
+          : event
+      )
+    );
+    // console.log("Event resized:", info.event);
+  };
+  // Render the task items dynamically
   const taskItems = Array.from({ length: 10 }, (_, i) => (
     <div key={i} className="draggable-item">
       Task {i + 1}
     </div>
   ));
 
+  // Customize event content rendering
   const renderEventContent = (eventInfo: any) => {
-    console.log(JSON.stringify(eventInfo, null, 2));
+    console.log("renderEventContent");
+
     const isExpired =
-      new Date(eventInfo.event.end) < new Date() ? "expired" : "todo";
+      new Date(
+        eventInfo.event.end ? eventInfo.event.end : eventInfo.event.start
+      ) < new Date();
+
+    // console.log(JSON.stringify(eventInfo.event, null, 2));
 
     return (
-      <div className={`task-item ${isExpired}`}>
+      <div className={`task-item ${isExpired ? "expired" : "todo"}`}>
         {eventInfo.event.title} <br />
-        {isExpired.toUpperCase()}
+        {isExpired ? "EXPIRED" : "TODO"}
       </div>
     );
   };
@@ -94,8 +123,8 @@ const TaskCalendar: React.FC = () => {
           droppable={true}
           events={events}
           eventContent={renderEventContent}
-          // eventReceive={handleEventandleEventDragDrop}
-          drop={handleEventandleEventDragDrop}
+          eventResize={handleEventResize}
+          drop={handleEventDragDrop}
           headerToolbar={{
             left: "prev,next today",
             center: "title",
@@ -113,3 +142,4 @@ const TaskCalendar: React.FC = () => {
 };
 
 export default TaskCalendar;
+
