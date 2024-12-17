@@ -1,11 +1,12 @@
 // npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/list @fullcalendar/timegrid @fullcalendar/interaction
 // fullcalendar.io/docs
-import React, { useState, useEffect } from "react";
-import FullCalendar, { EventInput } from "@fullcalendar/react";
+import React, { useState } from "react";
+import EventInput from "@fullcalendar/react";
+import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin, { Draggable } from "@fullcalendar/interaction";
+import interactionPlugin from "@fullcalendar/interaction";
 import "../../../css/calendar.css";
 
 // Define the shape of an event
@@ -21,18 +22,14 @@ const TaskCalendar: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
 
   // Initialize Draggable once the component is mounted
-  useEffect(() => {
-    const containerEl = document.getElementById("draggable");
-    if (containerEl) {
-      new Draggable(containerEl, {
-        itemSelector: ".draggable-item",
-        // eventData: (eventEl) => ({
-        //   id: `event-${eventEl.innerText.trim()}`,
-        //   title: eventEl.innerText.trim(),
-        // }),
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   const containerEl = document.getElementById("draggable");
+  //   if (containerEl) {
+  //     new Draggable(containerEl, {
+  //       itemSelector: ".draggable-item"
+  //     });
+  //   }
+  // }, []);
 
   // Handle drag-and-drop events
   const handleEventDragDrop = (info: any) => {
@@ -76,12 +73,6 @@ const TaskCalendar: React.FC = () => {
     );
     // console.log("Event resized:", info.event);
   };
-  // Render the task items dynamically
-  const taskItems = Array.from({ length: 10 }, (_, i) => (
-    <div key={i} className="draggable-item">
-      Task {i + 1}
-    </div>
-  ));
 
   // Customize event content rendering
   const renderEventContent = (eventInfo: any) => {
@@ -104,12 +95,6 @@ const TaskCalendar: React.FC = () => {
 
   return (
     <>
-      <div className="taskbar-container">
-        <div id="draggable" style={{ marginRight: "20px" }}>
-          <h1>Taskbar</h1>
-          {taskItems}
-        </div>
-      </div>
       <div className="calendar-container">
         <FullCalendar
           plugins={[

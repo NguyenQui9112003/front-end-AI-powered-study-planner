@@ -8,7 +8,7 @@
     border: none;
   }
   .draggable-item {
-    background-color: #3788d8;
+    background-color: #3182ce;
     color: white;
     padding: px;
     border: 1px solid;
@@ -58,7 +58,7 @@
     color: rgb(197, 228, 255);
     /* text-align: center; */
     font-family: Trebuchet MS;
-    height: 100vh;
+    /* height: 100vh; */
   }
   .draggable-item {
     padding: 8px;
@@ -66,14 +66,14 @@
   .task-item {
     padding: 3px 5px;
     margin: 1px;
-    border: ;
+    border: 1px;
   }
   .expired {
-    background-color: red;
+    background-color: gray;
     border-radius: 5px;
   }
   .todo {
-    background-color: #3788d8;
+    background-color: #3182ce;
     border-radius: 5px;
   }
   

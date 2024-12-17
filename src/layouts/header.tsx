@@ -30,9 +30,10 @@ export const Header = () => {
                             <span className="flex shrink-0 items-center">
                                 <img
                                     className="h-8 w-auto"
-                                    src=""
+                                    src="..\public\assets\ailogo.png"
                                     alt="Logo"
                                 />
+                                {/* <h1> AI Sudy Planner</h1> */}
                             </span>
                             <div className="ml-6 block">
                                 <div className="flex space-x-4">
