@@ -14,7 +14,23 @@ type UpdateTaskFormProps = {
     onSave: (data: { taskName: string; description: string; priorityLevel: string; estimatedTime: string; status: string }) => void;
 };
 
-export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultValues, onSave }, ref) => {
+type InputedData = {
+    taskName: string;
+    description: string;
+    priorityLevel: string;
+    estimatedTime: string;
+    status: string;
+}
+
+let newInputData: InputedData = {
+    taskName: '',
+    description: '',
+    priorityLevel: '',
+    estimatedTime: '',
+    status: ''
+};
+
+export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultValues }, ref) => {
     type Inputs = {
         taskName: string
         description: string
@@ -32,12 +48,45 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
         defaultValues,
     });
 
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        onSave(data); // Gọi hàm cha để cập nhật bảng
+
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        try {
+            const response = await fetch('http://localhost:3000/tasks/update', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+
+            newInputData = data;
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Server error');
+            } else {
+                toast.success("Task updated successfully", {
+                    position: 'top-right',
+                });
+            }
+
+        } catch (error) {
+            console.error("Server: Failed request.");
+            if (error instanceof Error) {
+                toast.error(error.message, {
+                    position: 'top-right',
+                });
+            } else {
+                toast.error('Server: An unexpected error occurred.', {
+                    position: 'top-right',
+                });
+            }
+        }
     };
 
     useEffect(() => {
         if (isSubmitSuccessful) {
+            defaultValues = newInputData;
             reset(defaultValues); // Reset giá trị mặc định khi thành công
         }
     }, [isSubmitSuccessful, reset, defaultValues]);
@@ -45,12 +94,6 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
     useEffect(() => {
         reset(defaultValues); // Reset giá trị mặc định khi nhận props mới
     }, [defaultValues, reset]);
-
-    // useEffect(() => {
-    //     if (isSubmitSuccessful) {
-    //         reset({ taskName: "", description: "", priorityLevel: "", estimatedTime: "", status: "" });
-    //     }
-    // }, [isSubmitSuccessful, reset]);
 
     useImperativeHandle(ref, () => ({
         submitForm: () => handleSubmit(onSubmit)(),
@@ -63,10 +106,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
                 <form action="task/create" className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-1">
                         <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Task name</label>
-                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="taskName" type="text" {...register("taskName", {
-                            required: "This field is required",
-                        })} />
-                        {errors.taskName && <div className='text-xs text-left mt-1 text-red-700'>{errors.taskName.message}</div>}
+                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" readOnly id="taskName" type="text" {...register("taskName",)} />
                     </div>
 
                     <div className="mb-1">
@@ -79,10 +119,23 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
 
                     <div className="mb-1">
                         <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Priority level</label>
-                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="priorityLevel" type="text" {...register("priorityLevel", {
-                            required: "This field is required",
-                        })} />
-                        {errors.priorityLevel && <div className='text-xs text-left mt-1 text-red-700'>{errors.priorityLevel.message}</div>}
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="priorityLevel"
+                            {...register("priorityLevel", {
+                                required: "This field is required",
+                            })}
+                        >
+                            <option value="">Select</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        {errors.status && (
+                            <div className="text-xs text-left mt-1 text-red-700">
+                                {errors.status.message}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-1">
@@ -103,9 +156,9 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
                             })}
                         >
                             <option value="">Select</option>
-                            <option value="completed">Completed</option>
-                            <option value="scheduled">Schedule</option>
-                            <option value="pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            <option value="In Process">In Process</option>
+                            <option value="Todo">Todo</option>
                         </select>
                         {errors.status && (
                             <div className="text-xs text-left mt-1 text-red-700">
