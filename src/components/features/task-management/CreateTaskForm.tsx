@@ -20,34 +20,36 @@ export const CreateTaskForm = forwardRef((_, ref) => {
     } = useForm<Inputs>()
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        // try {
-        //     const response = await fetch('http://localhost:3000/auth/create-task', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-type': 'application/json'
-        //         },
-        //         body: JSON.stringify(data),
-        //     })
+        try {
+            const response = await fetch('http://localhost:3000/tasks/create', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(data),
+            })
 
-        //     if (!response.ok) {
-        //         const errorData = await response.json();
-        //         throw new Error(errorData.message || 'Server error');
-        //     }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Server error');
+            } else {
+                toast.success("Task created successfully", {
+                    position: 'top-right',
+                });
+            }
 
-        // } catch (error) {
-        //     console.error("Server: Failed request.");
-        //     if (error instanceof Error) {
-        //         toast.error(error.message, {
-        //             position: 'top-right',
-        //         });
-        //     } else {
-        //         toast.error('An unexpected error occurred.', {
-        //             position: 'top-right',
-        //         });
-        //     }
-        // }
-
-        console.log(data);
+        } catch (error) {
+            console.error("Server: Failed request.");
+            if (error instanceof Error) {
+                toast.error(error.message, {
+                    position: 'top-right',
+                });
+            } else {
+                toast.error('Server: An unexpected error occurred.', {
+                    position: 'top-right',
+                });
+            }
+        }
     }
 
     useEffect(() => {
@@ -83,10 +85,23 @@ export const CreateTaskForm = forwardRef((_, ref) => {
 
                     <div className="mb-1">
                         <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Priority level</label>
-                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="priorityLevel" type="text" {...register("priorityLevel", {
-                            required: "This field is required",
-                        })} />
-                        {errors.priorityLevel && <div className='text-xs text-left mt-1 text-red-700'>{errors.priorityLevel.message}</div>}
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="priorityLevel"
+                            {...register("priorityLevel", {
+                                required: "This field is required",
+                            })}
+                        >
+                            <option value="">Select</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        {errors.status && (
+                            <div className="text-xs text-left mt-1 text-red-700">
+                                {errors.status.message}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-1">
@@ -107,9 +122,9 @@ export const CreateTaskForm = forwardRef((_, ref) => {
                             })}
                         >
                             <option value="">Select</option>
-                            <option value="completed">Completed</option>
-                            <option value="scheduled">Schedule</option>
-                            <option value="pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            <option value="In Process">In Process</option>
+                            <option value="Todo">Todo</option>
                         </select>
                         {errors.status && (
                             <div className="text-xs text-left mt-1 text-red-700">
