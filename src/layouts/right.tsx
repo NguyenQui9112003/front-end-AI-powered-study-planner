@@ -1,8 +1,10 @@
+import { AISuggestion } from "../components/features/ai/AISuggestion"
+
 export const Right = () => {
 
     return (
         <>
-            <div>Right</div>
+            <AISuggestion OnAnalyze={() => {}}  />
         </>
     )
 }
