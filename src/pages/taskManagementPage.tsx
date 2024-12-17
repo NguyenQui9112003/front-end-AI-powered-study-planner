@@ -98,7 +98,7 @@ export const TaskManagementPage = () => {
 
     const fetchTasks = async () => {
         try {
-            let response = await fetch('http://localhost:3000/tasks', {
+            const response = await fetch('http://localhost:3000/tasks', {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json'

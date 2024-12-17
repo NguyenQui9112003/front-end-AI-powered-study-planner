@@ -16,7 +16,7 @@ export const ProfilePage = () => {
             }
             const parsedToken = token ? JSON.parse(token) : null;
             let accessToken = parsedToken.access_token;
-            let refresh_token = parsedToken.refresh_token;
+            const refresh_token = parsedToken.refresh_token;
 
             try {
                 let response = await fetch('http://localhost:3000/auth/profile', {

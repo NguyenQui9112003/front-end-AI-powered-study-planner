@@ -4,7 +4,7 @@ export const Right = () => {
 
     return (
         <>
-            <AISuggestion OnAnalyze={() => {}}  />
+            <AISuggestion />
         </>
     )
 }
