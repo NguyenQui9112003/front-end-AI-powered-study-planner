@@ -51,7 +51,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(({ defaultVal
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            const response = await fetch('http://localhost:3000/tasks/update', {
+            const response = await fetch('https://be-ai-study-planner.onrender.com/tasks/update', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'

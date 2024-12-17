@@ -98,7 +98,7 @@ export const TaskManagementPage = () => {
 
     const fetchTasks = async () => {
         try {
-            const response = await fetch('http://localhost:3000/tasks', {
+            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks', {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json'
@@ -124,7 +124,7 @@ export const TaskManagementPage = () => {
 
     const deleteTask = async (taskName: string) => {
         try {
-            let response = await fetch('http://localhost:3000/tasks/delete', {
+            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks/delete', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -165,7 +165,7 @@ export const TaskManagementPage = () => {
         try {
             let data = { searchString: searchInput };
             console.log(data);
-            let response = await fetch('http://localhost:3000/tasks/find', {
+            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks/find', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
