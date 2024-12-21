@@ -6,33 +6,50 @@ import { CreateTaskForm } from '../components/features/task-management/CreateTas
 import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
 import 'react-toastify/dist/ReactToastify.css';
 import { Dropdown } from '../components/common/dropdown.tsx';
+import { jwtDecode } from 'jwt-decode';
+import dayjs from 'dayjs';
 
 type Row = {
     _id: number;
     taskName: string;
     description: string;
     priorityLevel: string;
-    estimatedTime: string;
+    startDate: Date | null;
+    endDate: Date | null;
     status: string;
 };
 
+interface CustomJwtPayload {
+    email: string;
+    // other props
+}
+
 export const TaskManagementPage = () => {
+    const token = window.localStorage.getItem('token');
+    const parsedToken = token ? JSON.parse(token) : null;
+    const accessToken = parsedToken.access_token;
+    const decodedToken = jwtDecode<CustomJwtPayload>(accessToken);
+
     const [openCreateTaskModal, setCreateTaskOpenModal] = useState(false);
     const [openUpdateTaskModal, setUpdateTaskOpenModal] = useState(false);
-    const [searchInput, setSearchInput] = useState("");
     const formRef = useRef<{ submitForm: () => void } | null>(null);
-    const [currentRow, setCurrentRow] = useState<Row | null>(null);
+
     const [data, setData] = useState<Row[]>([]);
+    const [currentRow, setCurrentRow] = useState<Row | null>(null);
+
     const [sortOption, setSortOption] = useState<string | null>(null);
     const [filterOption, setFilterOption] = useState<string | null>(null);
     let [processedData, setProcessedData] = useState<Row[]>([]);
+
+    const [searchInput, setSearchInput] = useState("");
     let [searchResult, setSearchResult] = useState<Row[]>([]);
 
     const defaultValues = currentRow || {
         taskName: "",
         description: "",
         priorityLevel: "",
-        estimatedTime: "",
+        startDate: null,
+        endDate: null,
         status: ""
     };
 
@@ -98,7 +115,7 @@ export const TaskManagementPage = () => {
 
     const fetchTasks = async () => {
         try {
-            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks', {
+            let response = await fetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(decodedToken.email)}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json'
@@ -124,12 +141,12 @@ export const TaskManagementPage = () => {
 
     const deleteTask = async (taskName: string) => {
         try {
-            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks/delete', {
+            let response = await fetch('http://localhost:3000/tasks/delete', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
                 },
-                body: JSON.stringify({ taskName })
+                body: JSON.stringify({ email: decodedToken.email, taskName })
             });
 
             if (!response.ok) {
@@ -165,7 +182,7 @@ export const TaskManagementPage = () => {
         try {
             let data = { searchString: searchInput };
             console.log(data);
-            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks/find', {
+            let response = await fetch('http://localhost:3000/tasks/find', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -274,7 +291,7 @@ export const TaskManagementPage = () => {
                             <td className="border border-gray-200 px-4 py-2">{row.taskName}</td>
                             <td className="border border-gray-200 px-4 py-2">{row.description}</td>
                             <td className="border border-gray-200 px-4 py-2">{row.priorityLevel}</td>
-                            <td className="border border-gray-200 px-4 py-2">{row.estimatedTime}</td>
+                            <td className="border border-gray-200 px-4 py-2">{dayjs(row.startDate).format('HH:mm:ss DD/MM/YYYY')} - {dayjs(row.endDate).format('HH:mm:ss DD/MM/YYYY')}</td>
                             <td className="border border-gray-200 px-4 py-2">{row.status}</td>
                             <td className="border border-gray-200 px-4 py-2">
                                 <button
@@ -301,7 +318,7 @@ export const TaskManagementPage = () => {
                     <div className="text-blue-500 font-bold text-2xl mb-3 text-center">Create Your Task</div>
                 </Modal.Header>
                 <Modal.Body>
-                    <CreateTaskForm ref={formRef}></CreateTaskForm>
+                    <CreateTaskForm ref={formRef} user={decodedToken.email}></CreateTaskForm>
                 </Modal.Body>
                 <Modal.Footer>
                     <div className='flex justify-end'>
@@ -316,7 +333,7 @@ export const TaskManagementPage = () => {
                     <div className="text-blue-500 font-bold text-2xl mb-3 text-center">Update Your Task</div>
                 </Modal.Header>
                 <Modal.Body>
-                    <UpdateTaskForm ref={formRef} defaultValues={defaultValues} onSave={handleSave}></UpdateTaskForm>
+                    <UpdateTaskForm ref={formRef} user={decodedToken.email} defaultValues={defaultValues} onSave={handleSave}></UpdateTaskForm>
                 </Modal.Body>
                 <Modal.Footer>
                     <div className='flex justify-end'>
@@ -372,5 +389,6 @@ export const TaskManagementPage = () => {
                 </button>
             </div> */}
         </div >
+        
     );
 }
