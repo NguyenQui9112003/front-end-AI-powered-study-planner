@@ -17,8 +17,6 @@
     "@fullcalendar/timegrid": "^6.1.15",
     "@mantine/core": "^7.15.1",
     "@mantine/dates": "^7.15.1",
-    "@mantine/core": "^7.15.1",
-    "@mantine/dates": "^7.15.1",
     "@material-tailwind/react": "^2.1.10",
     "@radix-ui/react-collapsible": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.1",

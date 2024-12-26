@@ -3,7 +3,9 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
     type Inputs = {
         email: string; // set user:props from parent
@@ -15,16 +17,6 @@ export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
         status: string;
     }
 
-    const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful }, } = useForm<Inputs>({})
-
-    useEffect(() => {
-        if (isSubmitSuccessful) {
-            reset({
-                taskName: "", description: "", priorityLevel: "", startDate: null, endDate: null, status: ""
-            });
-        }
-    }, [isSubmitSuccessful, reset]);
-
     useImperativeHandle(ref, () => ({
         submitForm: () => handleSubmit(onSubmit)(),
     }));
@@ -89,42 +81,6 @@ export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
     useImperativeHandle(ref, () => ({
         submitForm: () => handleSubmit(onSubmit)(),
     }));
-
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        // set user
-        data.email = user;
-
-        try {
-            const response = await fetch('http://localhost:3000/tasks/create', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(data),
-            })
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Server error');
-            } else {
-                toast.success("Task created successfully", {
-                    position: 'top-right',
-                });
-            }
-
-        } catch (error) {
-            console.error("Server: Failed request.");
-            if (error instanceof Error) {
-                toast.error(error.message, {
-                    position: 'top-right',
-                });
-            } else {
-                toast.error('Server: An unexpected error occurred.', {
-                    position: 'top-right',
-                });
-            }
-        }
-    }
 
     return (
         <>

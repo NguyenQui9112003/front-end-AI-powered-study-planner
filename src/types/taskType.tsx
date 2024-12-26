@@ -1,11 +1,11 @@
 export interface Task {
-    _id: number;
+    _id?: number;
     taskName: string;
     description: string;
     priorityLevel: string;
     startDate: Date | null;
     endDate: Date | null;
     status: string;
-    createdAt?: Date | string | null;
-    updatedAt?: Date | string | null;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
 };
