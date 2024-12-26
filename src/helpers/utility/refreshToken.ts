@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 export const useRefreshToken = () => {
     const navigate = useNavigate();
 
-    const refreshToken = async (refresh_token: String) => {
+    const refreshToken = async (refresh_token: string) => {
         if (!refresh_token) {
             navigate('/signIn');
             return null;
