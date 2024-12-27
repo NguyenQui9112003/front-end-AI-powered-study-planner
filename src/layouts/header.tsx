@@ -116,8 +116,8 @@ export const Header = () => {
                                     >
                                         <span className="sr-only">Open user menu</span>
                                         <img
-                                            className="h-8 w-8"
-                                            src=""
+                                            className="h-8 w-8 border-2 border-amber-500 rounded-full"
+                                            src="..\public\assets\user.png"
                                             alt="avatar"
                                         />
                                     </button>

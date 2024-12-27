@@ -15,23 +15,6 @@
     margin: 12px;
     cursor: pointer;
   }
-  /* 
-  .external-events {
-    width: 200px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
-  
-  .external-event {
-    margin: 5px 0;
-    padding: 10px;
-    background-color: #8fb7df;
-    color: white;
-    cursor: grab;
-    text-align: center;
-  } */
   .calendar-space {
     display: flex; /* Use flexbox to align items in a row */
     justify-content: space-between; /* Optional: adds space between divs */
@@ -68,12 +51,18 @@
     margin: 1px;
     border: 1px;
   }
-  .expired {
-    background-color: gray;
+  .fc-event {
     border-radius: 5px;
+    color: white;
+
+}
+  .fc-event:has(.todo) {
+    background-color: #3182ce !important; 
+
   }
-  .todo {
-    background-color: #3182ce;
-    border-radius: 5px;
+  
+
+  .fc-event:has(.expired) {
+    background-color: gray !important; 
   }
   
