@@ -3,6 +3,9 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
     type Inputs = {
         email: string; // set user:props from parent
@@ -14,6 +17,9 @@ export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
         status: string;
     }
 
+    useImperativeHandle(ref, () => ({
+        submitForm: () => handleSubmit(onSubmit)(),
+    }));
     const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful }, } = useForm<Inputs>({})
 
     useEffect(() => {
@@ -63,6 +69,18 @@ export const CreateTaskForm = forwardRef(({ user } : any, ref) => {
             }
         }
     }
+
+    useEffect(() => {
+        if (isSubmitSuccessful) {
+            reset({
+                taskName: "", description: "", priorityLevel: "", startDate: null, endDate: null, status: ""
+            });
+        }
+    }, [isSubmitSuccessful, reset]);
+
+    useImperativeHandle(ref, () => ({
+        submitForm: () => handleSubmit(onSubmit)(),
+    }));
 
     return (
         <>

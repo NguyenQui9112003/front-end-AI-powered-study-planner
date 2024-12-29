@@ -1,36 +1,68 @@
+import { authFetch } from '@/helpers/utility/authFetch';
+import { Button } from '../../../components/common/button';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Task } from '@/types/taskType';
+import dayjs from 'dayjs';
+import { adjustToUTC7 } from '@/helpers/utility/timezone';
 
+interface AISuggestionProps {
+	tasks: Task[];
+}
 
-const responseExample = `Overall, your schedule seems ambitious but manageable. However, there are a few areas for improvement:
+interface AIScheduleFeedback {
+	feedback: {
+		overall: string;
+		suggestions: [{ suggestion: string }];
+	};
+}
 
-* **Time Allocation:**  The time allocated to History might be insufficient, given the essay writing requirement. Consider extending the essay writing time, potentially by reducing the time spent on Physics problem sets on Monday, or spreading the work across multiple days.
-* **Breaks:**  While breaks are included, ensure they are truly utilized for rest and rejuvenation, not just passive scrolling.  Consider incorporating short, active breaks like stretching or walking.
-* **Evening Studying:** Avoiding late-night studying is crucial.  Consider shifting some of the sessions to earlier in the day.  For instance, moving the Monday Chemistry Lab Report to the afternoon might prevent late-night work.
-* **Balance:** The schedule leans heavily towards STEM subjects; consider if a more balanced approach, incorporating short review sessions for History between other subjects, might aid retention and reduce mental fatigue.
+export const AISuggestion = (props: AISuggestionProps) => {
+	const [AIResponse, setAIResponse] = useState<string>('No suggstion yet');
+	const navigate = useNavigate();
 
+	const onClick = async () => {
+		const tasks = props.tasks.map((task) => {
+			const startDate = task.startDate
+				? dayjs(adjustToUTC7(task.startDate)).format('HH:mm DD/MM/YYYY')
+				: null;
+			const endDate = task.endDate
+				? dayjs(adjustToUTC7(task.endDate)).format('HH:mm DD/MM/YYYY')
+				: null;
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { _id, createdAt, updatedAt, ...rest } = task;
+			return { ...rest, startDate, endDate };
+		});
 
-**Specific Suggestions:**
-1.  **Extend History time:** Add an additional hour to History sessions on Monday and Tuesday.
-2.  **Shift Chemistry:** Move the Monday Chemistry Lab Report to between 1:00 PM and 4:00 PM.
-3.  **Prioritize:**  Focus on completing the most challenging tasks (e.g., the History essay) early in the day when you are most alert.
-4.  **Incorporate short reviews:** Allocate 15-20 minutes between subjects to quickly review the previous material, improving retention.
+		console.log(tasks);
 
-By implementing these suggestions, your study schedule will be more efficient, balanced, and less likely to lead to burnout.  Remember to adjust the schedule based on your personal preferences and energy levels.`;
-
-
-export const AISuggestion = () => {
-	const [AIResponse, setAIResponse] = useState<string>(responseExample);
-
-	const OnClick = async () => {
-		const response = await fetch('localhost:3000/ai/suggestion', {
+		const response = await authFetch('http://localhost:3000/ai/schedule', {
 			method: 'POST',
 			headers: {
-				'Content-type': 'application/json',
+				'Content-Type': 'application/json',
 			},
+			body: JSON.stringify(tasks),
 		});
-		response.json().then((res) => {
-			setAIResponse(res);
-		});
+
+		if (!response) {
+			navigate('/signIn');
+			return;
+		}
+
+		const feedback: AIScheduleFeedback = await response.json();
+		let feedbackString = feedback.feedback.overall + '\n\n';
+		let index = 1;
+
+		for (const suggestion of feedback.feedback.suggestions) {
+			feedbackString += index + '. ' + suggestion.suggestion + '\n\n';
+			index++;
+		}
+
+		setAIResponse(feedbackString);
+
+		// response.json().then((res) => {
+		// 	setAIResponse(res);
+		// }).catch(error => console.log(error));
 	};
 
 	return (
@@ -39,16 +71,13 @@ export const AISuggestion = () => {
 				<h1 className="text-xl font-medium">AI Suggestion</h1>
 			</div>
 
-			<div className="flex w-full p-1 my-4 justify-center min-h-full border-2 border-blue-300">
-				<p className="text-sm font-medium text-blue-700">{AIResponse}</p>
+			<div className="flex w-full px-4 py-2 my-4 justify-center min-h-full border-2 border-blue-300">
+				<p className="text-sm font-medium text-left text-blue-700 whitespace-pre-line">
+					{AIResponse}
+				</p>
 			</div>
 
-			<button
-				onClick={OnClick}
-				className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-			>
-				Analyze
-			</button>
+			<Button onClick={onClick}>Analyze</Button>
 		</div>
 	);
 };
