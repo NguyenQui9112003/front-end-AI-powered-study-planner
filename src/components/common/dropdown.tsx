@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 
 type DropdownProps<T> = {
-    options: T[]; // Mảng các giá trị để hiển thị
-    onSelect: (selected: T) => void; // Hàm callback trả về giá trị đã chọn
-    placeholder?: string; // Placeholder hiển thị khi chưa chọn gì
-    renderOption?: (option: T) => React.ReactNode; // Tùy chỉnh cách hiển thị từng tùy chọn
-    value: T | null; // Giá trị hiện tại đã chọn
+    options: T[]; 
+    onSelect: (selected: T) => void; 
+    placeholder?: string; 
+    renderOption?: (option: T) => React.ReactNode; 
+    value: T | null; 
 };
 
 export const Dropdown = <T extends string | number>({
@@ -18,7 +18,7 @@ export const Dropdown = <T extends string | number>({
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Đóng dropdown khi click ra ngoài
+    // close dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

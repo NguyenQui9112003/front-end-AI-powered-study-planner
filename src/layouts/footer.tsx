@@ -1,5 +1,4 @@
 export const Footer = () => {
-
     return (
         <>
             <div>21127153 - Nguyen Huynh Phu Qui</div>

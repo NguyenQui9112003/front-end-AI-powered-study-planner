@@ -5,7 +5,7 @@ const refreshToken = async (refresh_token: string) => {
 
 	try {
 		const response = await fetch(
-			'https://be-ai-study-planner.onrender.com/auth/refresh-token',
+			'http://localhost:3000/auth/refresh-token',
 			{
 				method: 'POST',
 				headers: {

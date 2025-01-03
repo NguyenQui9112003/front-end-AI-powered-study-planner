@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+interface AuthProviderProps {
+    children: ReactNode;
+}
+
 interface AuthContextProps {
     isAuthenticated: boolean;
     login: (token: string) => void;
@@ -15,10 +19,6 @@ export const useAuth = () => {
     }
     return context;
 };
-
-interface AuthProviderProps {
-    children: ReactNode;
-}
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const logout = () => {
         window.localStorage.removeItem('token');
-        window.localStorage.removeItem('user');
         setIsAuthenticated(false);
     };
 
