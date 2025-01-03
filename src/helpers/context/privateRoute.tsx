@@ -8,13 +8,10 @@ interface PrivateRouteProps {
 
 const PrivateRoute = ({ element }: PrivateRouteProps) => {
     const { isAuthenticated } = useAuth();
-
     const token = window.localStorage.getItem('token');
-
     if (!isAuthenticated && !token) {
         return <Navigate to="/signIn" replace />;
     }
-
     return <>{element}</>;
 };
 

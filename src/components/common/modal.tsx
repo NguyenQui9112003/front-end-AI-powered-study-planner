@@ -1,5 +1,5 @@
-import { useEffect, useContext, createContext, ReactNode } from "react";
 import "../../css/modal.css";
+import { useEffect, useContext, createContext, ReactNode } from "react";
 
 interface ModalProps {
     children: ReactNode;

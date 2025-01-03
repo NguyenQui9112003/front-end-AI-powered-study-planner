@@ -3,8 +3,9 @@ export interface Task {
     taskName: string;
     description: string;
     priorityLevel: string;
-    startDate: Date | null;
-    endDate: Date | null;
+    timeFocus: string;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
     status: string;
     createdAt?: Date | null;
     updatedAt?: Date | null;

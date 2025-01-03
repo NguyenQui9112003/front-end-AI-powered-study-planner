@@ -1,24 +1,26 @@
-import { useEffect, useImperativeHandle, forwardRef } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { useEffect, useImperativeHandle, forwardRef } from 'react';
 
 import { Task } from '@/types/taskType';
+import { adjustToUTC7 } from '@/helpers/utility/timezone';
 
 type UpdateTaskFormProps = {
 	defaultValues: Task;
 	onSave: (data: Task) => void;
-	user: string; // user:props
+	user: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 	({ defaultValues, user }, ref) => {
 		type Inputs = {
-			email: string; // set user:props from parent
+			username: string;
 			taskName: string;
 			description: string;
 			priorityLevel: string;
+			time: string;
 			startDate: Date | string | null;
 			endDate: Date | string | null;
 			status: string;
@@ -28,21 +30,8 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 			register,
 			handleSubmit,
 			reset,
-			formState: { errors, isSubmitSuccessful },
+			formState: { errors },
 		} = useForm<Inputs>({ defaultValues });
-
-		useEffect(() => {
-			if (isSubmitSuccessful) {
-				// console.log("update completed");
-			}
-		}, [isSubmitSuccessful, reset]);
-
-		const adjustToUTC7 = (date: string | Date | null) => {
-			if (!date) return null;
-			const parsedDate = typeof date === 'string' ? new Date(date) : date; // Chuyển chuỗi thành Date nếu cần
-			parsedDate.setMinutes(parsedDate.getMinutes() + 420); // Thêm 420 phút = 7 giờ
-			return parsedDate.toISOString().slice(0, 16);
-		};
 
 		useEffect(() => {
 			const formattedValues = {
@@ -50,7 +39,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 				startDate: adjustToUTC7(defaultValues.startDate),
 				endDate: adjustToUTC7(defaultValues.endDate),
 			};
-			reset(formattedValues); // Reset giá trị mặc định khi nhận props từ parent
+			reset(formattedValues); // get data props from parent 
 		}, [defaultValues, reset]);
 
 		useImperativeHandle(ref, () => ({
@@ -58,12 +47,9 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 		}));
 
 		const onSubmit: SubmitHandler<Inputs> = async (data) => {
-			// set user
-			data.email = user;
-
+			data.username = user;
 			try {
-				const response = await fetch(
-					'http://localhost:3000/tasks/update',
+				const response = await fetch('http://localhost:3000/tasks/update',
 					{
 						method: 'POST',
 						headers: {
@@ -94,40 +80,6 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 			}
 		};
 
-		useEffect(() => {
-			const newInputData: Task = {
-				taskName: '',
-				description: '',
-				priorityLevel: '',
-				startDate: null,
-				endDate: null,
-				status: '',
-			};
-
-			if (isSubmitSuccessful) {
-				defaultValues = newInputData;
-				/* Assignments to the 'defaultValues' variable from inside React Hook 
-                useEffect will be lost after each render. To preserve the value over time, 
-                store it in a useRef Hook and keep the mutable value in the '.current' property. 
-                Otherwise, you can move this variable directly inside useEffect.*/
-
-				reset(defaultValues); // Reset giá trị mặc định khi thành công
-			}
-		}, [isSubmitSuccessful, reset]);
-
-		useEffect(() => {
-			const formattedValues = {
-				...defaultValues,
-				startDate: adjustToUTC7(defaultValues.startDate),
-				endDate: adjustToUTC7(defaultValues.endDate),
-			};
-			reset(formattedValues); // Reset giá trị mặc định khi nhận props từ parent
-		}, [defaultValues, reset]);
-
-		useImperativeHandle(ref, () => ({
-			submitForm: () => handleSubmit(onSubmit)(),
-		}));
-
 		return (
 			<>
 				<ToastContainer />
@@ -135,8 +87,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 					<form
 						action="task/create"
 						className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-						onSubmit={handleSubmit(onSubmit)}
-					>
+						onSubmit={handleSubmit(onSubmit)}>
 						<div className="mb-1">
 							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
 								Task name
@@ -145,15 +96,8 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 								id="taskName"
 								type="text"
-								{...register('taskName', {
-									required: 'This field is required',
-								})}
-							/>
-							{errors.taskName && (
-								<div className="text-xs text-left mt-1 text-red-700">
-									{errors.taskName.message}
-								</div>
-							)}
+								readOnly
+								{...register('taskName')}/>
 						</div>
 
 						<div className="mb-1">
@@ -164,10 +108,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 								id="description"
 								type="text"
-								{...register('description', {
-									required: 'This field is required',
-								})}
-							/>
+								{...register('description', { required: 'This field is required' })}/>
 							{errors.description && (
 								<div className="text-xs text-left mt-1 text-red-700">
 									{errors.description.message}
@@ -182,17 +123,13 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 							<select
 								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 								id="priorityLevel"
-								{...register('priorityLevel', {
-									required: 'This field is required',
-								})}
+								{...register('priorityLevel', { required: 'This field is required' })}
 								style={{
 									backgroundImage:
 										"url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22gray%22><path fill-rule=%22evenodd%22 d=%22M10 14a1 1 0 01-.707-.293l-3-3a1 1 0 111.414-1.414L10 11.586l2.293-2.293a1 1 0 011.414 1.414l-3 3A1 1 0 0110 14z%22 clip-rule=%22evenodd%22 /></svg>')",
 									backgroundPosition: 'right 0.3rem center',
 									backgroundRepeat: 'no-repeat',
-									backgroundSize: '2rem 2rem',
-								}}
-							>
+									backgroundSize: '2rem 2rem',}}>
 								<option value="">Select</option>
 								<option value="Low">Low</option>
 								<option value="Medium">Medium</option>
@@ -224,36 +161,50 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 							)}
 						</div>
 
-                    <div className="mb-1">
-                        <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Estimated time (HH:MM)</label>
-                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="estimatedTime" type="text" {...register("estimatedTime", {
-                            required: "This field is required",
-                        })} />
-                        {errors.estimatedTime && <div className='text-xs text-left mt-1 text-red-700'>{errors.estimatedTime.message}</div>}
-                    </div>
+						<div className="mb-1">
+							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">End date</label>
+							<input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="endDate"
+								type="datetime-local"
+								{...register("endDate",
+									{ required: "This field is required", })} />
+							{errors.endDate &&
+								<div className='text-xs text-left mt-1 text-red-700'>
+									{errors.endDate.message}
+								</div>}
+						</div>
 
-                    <div className="mb-1">
-                        <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Status</label>
-                        <select
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            id="status"
-                            {...register("status", {
-                                required: "This field is required",
-                            })}
-                        >
-                            <option value="">Select</option>
-                            <option value="Completed">Completed</option>
-                            <option value="In Process">In Process</option>
-                            <option value="Todo">Todo</option>
-                        </select>
-                        {errors.status && (
-                            <div className="text-xs text-left mt-1 text-red-700">
-                                {errors.status.message}
-                            </div>
-                        )}
-                    </div>
-                </form>
-            </div>
-        </>
-    )
-})
+						<div className="mb-1">
+							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">Status</label>
+							<select
+								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="status"
+								{...register("status", {
+									required: "This field is required",
+								})}
+								style={{
+									backgroundImage:
+										"url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22gray%22><path fill-rule=%22evenodd%22 d=%22M10 14a1 1 0 01-.707-.293l-3-3a1 1 0 111.414-1.414L10 11.586l2.293-2.293a1 1 0 011.414 1.414l-3 3A1 1 0 0110 14z%22 clip-rule=%22evenodd%22 /></svg>')",
+									backgroundPosition: 'right 0.3rem center',
+									backgroundRepeat: 'no-repeat',
+									backgroundSize: '2rem 2rem',
+								}}
+							>
+								<option value="">Select</option>
+
+								<option value="Todo">Todo</option>
+								<option value="In Progress">In Progress</option>
+								<option value="Completed">Completed</option>
+								<option value="Expired">Expired</option>
+							</select>
+							{errors.status && (
+								<div className="text-xs text-left mt-1 text-red-700">
+									{errors.status.message}
+								</div>
+							)}
+						</div>
+					</form>
+				</div>
+			</>
+		)
+	})
