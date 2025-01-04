@@ -23,7 +23,7 @@ export const RegisterForm = () => {
         confirm_password: string
     }
 
-    const {register, handleSubmit, watch, reset, formState: { errors, isSubmitSuccessful }} = useForm<Inputs>()
+    const { register, handleSubmit, watch, reset, formState: { errors, isSubmitSuccessful } } = useForm<Inputs>()
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
             const userData: UserData = {
@@ -81,21 +81,40 @@ export const RegisterForm = () => {
                     </div>
 
                     <div className="mb-1">
+                        <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Email</label>
+                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="email"
+                            type="text"
+                            {...register("email", {
+                                required: "This field is required",
+                                pattern: {
+                                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                                    message: "Invalid email address"
+                                }
+                            })} />
+                        {errors.email &&
+                            <div className='text-xs text-left mt-1 text-red-700'>
+                                {errors.email.message}
+                            </div>}
+                    </div>
+
+                    <div className="mb-1">
                         <label className="block text-gray-700 text-sm font-bold mb-2 text-left">Password</label>
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="password"
                             type="password"
-                            {...register("password", { required: "This field is required",
-                            maxLength: {
-                                value: 20,
-                                message: "Password must be at most 20 characters long"
-                            },
-                            validate: (val: string) => {
-                                if (watch('confirm_password') !== val) {
-                                    return "Your password does no match";
+                            {...register("password", {
+                                required: "This field is required",
+                                maxLength: {
+                                    value: 20,
+                                    message: "Password must be at most 20 characters long"
+                                },
+                                validate: (val: string) => {
+                                    if (watch('confirm_password') !== val) {
+                                        return "Your password does no match";
+                                    }
                                 }
-                            }
-                        })} />
+                            })} />
                         {errors.password &&
                             <div className='text-xs text-left mt-1 text-red-700'>
                                 {errors.password.message}
@@ -107,17 +126,18 @@ export const RegisterForm = () => {
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="confirm-password"
                             type="password"
-                            {...register("confirm_password", { required: "This field is required",
-                            maxLength: {
-                                value: 20,
-                                message: "Password must be at most 20 characters long"
-                            },
-                            validate: (val: string) => {
-                                if (watch('password') !== val) {
-                                    return "Your password does no match";
+                            {...register("confirm_password", {
+                                required: "This field is required",
+                                maxLength: {
+                                    value: 20,
+                                    message: "Password must be at most 20 characters long"
+                                },
+                                validate: (val: string) => {
+                                    if (watch('password') !== val) {
+                                        return "Your password does no match";
+                                    }
                                 }
-                            }
-                        })} />
+                            })} />
                         {errors.confirm_password &&
                             <div className='text-xs text-left mt-1 text-red-700'>
                                 {errors.confirm_password.message}
