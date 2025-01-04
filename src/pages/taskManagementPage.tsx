@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import { jwtDecode } from 'jwt-decode';
 import dayjs from 'dayjs';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Task } from '@/types/taskType.tsx';
+import { getTokenData } from '@/helpers/utility/tokenData.ts';
 
 import { Modal } from '../components/common/modal.tsx';
 import { Dropdown } from '../components/common/dropdown.tsx';
@@ -19,17 +19,10 @@ import { UpdateTaskForm } from '../components/features/task-management/UpdateTas
 
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
 
-interface CustomJwtPayload {
-	username: string;
-}
-
 export const TaskManagementPage = () => {
-	const token = window.localStorage.getItem('token');
-	const parsedToken = token ? JSON.parse(token) : null;
-	const accessToken = parsedToken.access_token;
-	const decodedToken = jwtDecode<CustomJwtPayload>(accessToken);
+	const user = getTokenData().username;
 
-	const [data, setData] = useState<Task[]>([]);
+	const [dataFetch, setDataFetch] = useState<Task[]>([]);
 	const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
 	const [openCreateTaskModal, setCreateTaskOpenModal] = useState(false);
@@ -37,12 +30,11 @@ export const TaskManagementPage = () => {
 	const [openTimerModal, setTimerOpenModal] = useState(false);
 	const formRef = useRef<{ submitForm: () => void } | null>(null);
 
-	const [sortOption, setSortOption] = useState<string | null>(null);
-	const [filterOption, setFilterOption] = useState<string | null>(null);
+	const [sortOption, setSortOption] = useState<string | null>("Sort");
+	const [filterOption, setFilterOption] = useState<string | null>("Filter");
 	const [processedData, setProcessedData] = useState<Task[]>([]);
 
 	const [searchInput, setSearchInput] = useState('');
-	const [searchResult, setSearchResult] = useState<Task[]>([]);
 
 	const defaultValues = currentTask || {
 		taskName: '',
@@ -108,7 +100,7 @@ export const TaskManagementPage = () => {
 	};
 
 	const updateTask = (id: any, updatedTask: any) => {
-		setData(data.map((task) => (task._id === id ? updatedTask : task)));
+		setDataFetch(dataFetch.map((task) => (task._id === id ? updatedTask : task)));
 	};
 
 	useEffect(() => {
@@ -119,7 +111,7 @@ export const TaskManagementPage = () => {
 		try {
 			const response = await fetch(
 				`http://localhost:3000/tasks?userName=${encodeURIComponent(
-					decodedToken.username
+					user
 				)}`,
 				{
 					method: 'GET',
@@ -134,7 +126,7 @@ export const TaskManagementPage = () => {
 			}
 
 			const data = await response.json();
-			setData(data);
+			setDataFetch(data);
 			setProcessedData(data);
 		} catch (error) {
 			console.error('Error fetching profile:', error);
@@ -148,7 +140,7 @@ export const TaskManagementPage = () => {
 				headers: {
 					'Content-type': 'application/json',
 				},
-				body: JSON.stringify({ username: decodedToken.username, taskName }),
+				body: JSON.stringify({ username: user, taskName }),
 			});
 
 			if (!response.ok) {
@@ -172,54 +164,54 @@ export const TaskManagementPage = () => {
 		}
 	}
 
-	const handleFilterAndSort = () => {
-		console.log(filterOption);
+	const applyFilterSortSearch = () => {
+		let baseData = [...dataFetch]; 
+		// filter
+		if (filterOption !== 'Filter: Default') {
+			baseData = baseData.filter((item) => {
+				if (filterOption === 'Completed') return item.status === 'Completed';
+				if (filterOption === 'Todo') return item.status === 'Todo';
+				if (filterOption === 'In Progress') return item.status === 'In Progress';
+				if (filterOption === 'Expired') return item.status === 'Expired';
+				return true;
+			});
+		}
+
+		// sort
 		const priorityMap: { [key: string]: number } = {
 			High: 3,
 			Medium: 2,
 			Low: 1,
 		};
-
-		let newProcessedData = [...data];
-
-		if (filterOption === 'Completed') {
-			newProcessedData = newProcessedData.filter(
-				(item) => item.status === 'Completed'
-			);
-		} else if (filterOption === 'Todo') {
-			newProcessedData = newProcessedData.filter(
-				(item) => item.status === 'Todo'
-			);
-		} else if (filterOption === 'In Process') {
-			newProcessedData = newProcessedData.filter(
-				(item) => item.status === 'In Process'
-			);
-		} else if (sortOption === 'Filter: Default') {
-			// default
-		}
-
 		if (sortOption === 'Ascending') {
-			newProcessedData.sort(
-				(a, b) =>
-					priorityMap[a.priorityLevel] - priorityMap[b.priorityLevel]
+			baseData.sort(
+				(a, b) => priorityMap[a.priorityLevel] - priorityMap[b.priorityLevel]
 			);
 		} else if (sortOption === 'Descending') {
-			newProcessedData.sort(
-				(a, b) =>
-					priorityMap[b.priorityLevel] - priorityMap[a.priorityLevel]
+			baseData.sort(
+				(a, b) => priorityMap[b.priorityLevel] - priorityMap[a.priorityLevel]
 			);
-		} else if (sortOption === 'Sort: Default') {
-			// default
 		}
-		setProcessedData(newProcessedData);
+
+		// search
+		if (searchInput.trim() !== '') {
+			baseData = baseData.filter((item) =>
+				Object.values(item).some((value) =>
+					value.toString().toLowerCase().includes(searchInput.toLowerCase())
+				)
+			);
+		}
+		setProcessedData(baseData);
 	};
 
-	const handleSearchInputChange = (event: any) => {
+	useEffect(() => {
+		applyFilterSortSearch();
+	}, [filterOption, sortOption, searchInput]);
 
-	};
 
-	const handleSearchSubmit = async (event: any) => {
-
+	const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		applyFilterSortSearch(); 
 	};
 
 	return (
@@ -243,35 +235,21 @@ export const TaskManagementPage = () => {
 							name="Search Bar"
 							autoFocus
 							className="inline w-64 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-3 leading-5 placeholder-gray-400 focus:border-blue-500 focus:placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-							placeholder="Keyword"
+							placeholder="Search task"
 							type="search"
 							value={searchInput}
-							onChange={handleSearchInputChange} />
-						
-						<button
-							type="submit"
-							className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-							Search
-						</button>
+							onChange={(e) => setSearchInput(e.target.value)} />
 					</form>
 
 					<Dropdown
-						options={['Sort: Default', 'Ascending', 'Descending']}
+						options={['Default', 'Ascending', 'Descending']}
 						onSelect={(option) => setSortOption(option)}
-						placeholder="Sort"
-						value={sortOption}/>
+						value={sortOption} />
 
 					<Dropdown
-						options={['Filter: Default','Completed','In Process','Todo',]}
+						options={['Default', 'Todo', 'In Progress', 'Completed', 'Expired']}
 						onSelect={(option) => setFilterOption(option)}
-						placeholder="Filter"
-						value={filterOption}/>
-
-					<button
-						onClick={() => handleFilterAndSort()}
-						className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-						Sort & Filter
-					</button>
+						value={filterOption} />
 				</div>
 			</div>
 
@@ -299,12 +277,7 @@ export const TaskManagementPage = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{(searchResult.length > 0
-						? searchResult
-						: processedData.length > 0
-							? processedData
-							: []
-					).map((task) => (
+					{(processedData.length > 0 ? processedData : dataFetch).map((task) => (
 						<tr key={task._id} className="hover:bg-gray-50">
 							<td className="border border-gray-200 px-4 py-2">
 								{task.taskName}
@@ -349,7 +322,7 @@ export const TaskManagementPage = () => {
 					))}
 				</tbody>
 			</table>
-		
+
 			<Modal isOpen={openCreateTaskModal} onClose={handleCloseModal}>
 				<Modal.Header>
 					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
@@ -359,7 +332,7 @@ export const TaskManagementPage = () => {
 				<Modal.Body>
 					<CreateTaskForm
 						ref={formRef}
-						user={decodedToken.username}
+						user={user}
 					></CreateTaskForm>
 				</Modal.Body>
 				<Modal.Footer>
@@ -382,7 +355,7 @@ export const TaskManagementPage = () => {
 					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">Update Your Task</div>
 				</Modal.Header>
 				<Modal.Body>
-					<UpdateTaskForm ref={formRef} defaultValues={defaultValues} onSave={handleSave} user={decodedToken.username}></UpdateTaskForm>
+					<UpdateTaskForm ref={formRef} defaultValues={defaultValues} onSave={handleSave} user={user}></UpdateTaskForm>
 				</Modal.Body>
 				<Modal.Footer>
 					<div className='flex justify-end'>
@@ -399,7 +372,7 @@ export const TaskManagementPage = () => {
 					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">Timer&nbsp;&nbsp;&nbsp;</div>
 				</Modal.Header>
 				<Modal.Body>
-					<TimerForm ref={formRef} defaultValues={defaultValues} user={decodedToken.username}></TimerForm>
+					<TimerForm ref={formRef} defaultValues={defaultValues} user={user}></TimerForm>
 				</Modal.Body>
 				<Modal.Footer>
 					<div className='flex justify-end mt-3'>

@@ -33,7 +33,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/home",
-      element: <PrivateRoute element={<App />} />,
+      element: <App />,
       errorElement: <Error />,
     },
     {
@@ -41,6 +41,11 @@ const router = createBrowserRouter(
       element: <PrivateRoute element={<TaskManagementPage />} />,
       errorElement: <Error />,
     },
+    // {
+    //   path: "/analyze",
+    //   element: <PrivateRoute element={<AnalyzePage />} />,
+    //   errorElement: <Error />,
+    // },
     {
       path: "/profile",
       element: <ProfilePage />,
