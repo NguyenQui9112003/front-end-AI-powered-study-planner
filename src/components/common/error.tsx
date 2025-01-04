@@ -1,6 +1,11 @@
 import { useRouteError } from "react-router-dom";
 
 export const Error = () => {
+    interface RouteError {
+        status?: number;
+        statusText?: string;
+    }
+    
     const error = useRouteError() as RouteError;
     return (
         <section className="bg-white dark:bg-gray-900">
@@ -13,9 +18,4 @@ export const Error = () => {
             </div>
         </section>
     );
-
-    interface RouteError {
-        status?: number;
-        statusText?: string;
-    }
 }
