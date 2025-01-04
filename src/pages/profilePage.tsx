@@ -1,176 +1,257 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRefreshToken } from '../helpers/utility/refreshToken';
-import '../css/profile.css'; // Custom CSS file
-import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { Container, Row, Col, Card, Button, ListGroup, Form, ProgressBar } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRefreshToken } from "../helpers/utility/refreshToken";
+import "../css/profile.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import EmailVerificationModal from "@/components/features/profile/EmailVerificationModal";
+import Header from "@/layouts/header";
 
 export const ProfilePage = () => {
-    const navigate = useNavigate();
-    const getRefreshToken = useRefreshToken();
-    const [profile, setProfile] = useState({ username: '', email: '', isActive: false });
-    const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const navigate = useNavigate();
+  const getRefreshToken = useRefreshToken();
+  const [profile, setProfile] = useState({
+    username: "",
+    email: "",
+    isActive: false,
+    hasPassword: true,
+  });
+  const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const token = window.localStorage.getItem('token');
-            if (!token) {
-                navigate('/signIn');
-                return;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = window.localStorage.getItem("token");
+      if (!token) {
+        navigate("/signIn");
+        return;
+      }
+      const parsedToken = JSON.parse(token);
+      let accessToken = parsedToken.access_token;
+      const refreshToken = parsedToken.refresh_token;
+
+      try {
+        let response = await fetch("http://localhost:3000/auth/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProfile({
+            username: data.username,
+            email: data.email,
+            isActive: data.is_activated,
+            hasPassword: data.hasPassword,
+          });
+        } else if (response.status === 419) {
+          accessToken = await getRefreshToken(refreshToken);
+          if (accessToken) {
+            response = await fetch("http://localhost:3000/auth/profile", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              setProfile({
+                username: data.username,
+                email: data.email,
+                isActive: data.is_activated,
+                hasPassword: data.hasPassword,
+              });
+            } else {
+              navigate("/signIn");
             }
-            const parsedToken = JSON.parse(token);
-            let accessToken = parsedToken.access_token;
-            const refreshToken = parsedToken.refresh_token;
-
-            try {
-                let response = await fetch('http://localhost:3000/auth/profile', {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setProfile({ username: data.username, email: data.email, isActive: data.isActive });
-                } else if (response.status === 419) {
-                    accessToken = await getRefreshToken(refreshToken);
-                    if (accessToken) {
-                        response = await fetch('http://localhost:3000/auth/profile', {
-                            method: 'GET',
-                            headers: {
-                                Authorization: `Bearer ${accessToken}`,
-                            },
-                        });
-
-                        if (response.ok) {
-                            const data = await response.json();
-                            setProfile({ username: data.username, email: data.email, isActive: data.isActive });
-                        } else {
-                            navigate('/signIn');
-                        }
-                    }
-                } else {
-                    navigate('/signIn');
-                }
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-                navigate('/signIn');
-            }
-        };
-
-        fetchProfile();
-    }, [getRefreshToken, navigate]);
-
-    const handlePasswordChange = (e) => {
-        e.preventDefault();
-        if (passwords.new !== passwords.confirm) {
-            alert('New password and confirmation do not match.');
-            return;
+          }
+        } else {
+          navigate("/signIn");
         }
-        // Handle password change API call
-        console.log('Password changed:', passwords);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        navigate("/signIn");
+      }
     };
 
-    return (
-<>
-<Container>
-      <Row>
-        <Col lg={4}>
-          <Card>
-            <Card.Body>
-              <div className="d-flex flex-column align-items-center text-center">
-                <img
-                  src="https://bootdey.com/img/Content/avatar/avatar6.png"
-                  alt="Admin"
-                  className="rounded-circle p-1 bg-primary"
-                  width="110"
-                />
-                <div className="mt-3">
-                  <h4>John Doe</h4>
-                  <p className="text-secondary mb-1">Full Stack Developer</p>
-                  <p className="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
-                  <Button variant="primary">Follow</Button>
-                  <Button variant="outline-primary" className="ms-2">Message</Button>
+    fetchProfile();
+  }, []);
+
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+
+    const currentPassword =
+      (form.elements.namedItem("current") as HTMLInputElement)?.value || "";
+    const newPassword =
+      (form.elements.namedItem("new") as HTMLInputElement)?.value || "";
+    const confirmPassword =
+      (form.elements.namedItem("confirm") as HTMLInputElement)?.value || "";
+
+    console.log(form);
+
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirmation do not match.");
+      return;
+    }
+
+    try {
+      const token = JSON.parse(window.localStorage.getItem("token") || "{}");
+      const response = await fetch(
+        "http://localhost:3000/auth/changePassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.access_token}`,
+          },
+          body: JSON.stringify({
+            email: profile.email,
+            currentPassword,
+            newPassword,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Password changed successfully!");
+        profile.hasPassword = true;
+        form.reset();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || "Failed to change password."}`);
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      alert("An unexpected error occurred.");
+    }
+  };
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  return (
+    <>
+      <Header />
+      <Container>
+        <Row>
+          <Col lg={4}>
+            <Card className="m-3 p-1">
+              <Card.Body>
+                <div className="d-flex flex-column align-items-center">
+                  <img
+                    src="/assets/user.png"
+                    alt="Avatar"
+                    className="rounded-circle p-1 bg-primary"
+                    width="110"
+                  />
+                  <div className="mt-3">
+                    <h4>{profile.username}</h4>
+                  </div>
                 </div>
-              </div>
-              <hr className="my-4" />
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <h6 className="mb-0">Website</h6>
-                  <span className="text-secondary">https://bootdey.com</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <h6 className="mb-0">Github</h6>
-                  <span className="text-secondary">bootdey</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <h6 className="mb-0">Twitter</h6>
-                  <span className="text-secondary">@bootdey</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <h6 className="mb-0">Instagram</h6>
-                  <span className="text-secondary">bootdey</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <h6 className="mb-0">Facebook</h6>
-                  <span className="text-secondary">bootdey</span>
-                </ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={8}>
-          <Card>
-            <Card.Body>
-              <Row className="mb-3">
-                <Col sm={3}><h6 className="mb-0">Full Name</h6></Col>
-                <Col sm={9}><Form.Control type="text" value="John Doe" /></Col>
-              </Row>
-              <Row className="mb-3">
-                <Col sm={3}><h6 className="mb-0">Email</h6></Col>
-                <Col sm={9}><Form.Control type="text" value="john@example.com" /></Col>
-              </Row>
-              <Row className="mb-3">
-                <Col sm={3}><h6 className="mb-0">Phone</h6></Col>
-                <Col sm={9}><Form.Control type="text" value="(239) 816-9029" /></Col>
-              </Row>
-              <Row className="mb-3">
-                <Col sm={3}><h6 className="mb-0">Mobile</h6></Col>
-                <Col sm={9}><Form.Control type="text" value="(320) 380-4539" /></Col>
-              </Row>
-              <Row className="mb-3">
-                <Col sm={3}><h6 className="mb-0">Address</h6></Col>
-                <Col sm={9}><Form.Control type="text" value="Bay Area, San Francisco, CA" /></Col>
-              </Row>
-              <Row>
-                <Col sm={3}></Col>
-                <Col sm={9}>
-                  <Button variant="primary" className="px-4">Save Changes</Button>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-          <Card className="mt-4">
-            <Card.Body>
-              <h5 className="d-flex align-items-center mb-3">Project Status</h5>
-              <p>Web Design</p>
-              <ProgressBar now={80} variant="primary" className="mb-3" />
-              <p>Website Markup</p>
-              <ProgressBar now={72} variant="danger" className="mb-3" />
-              <p>One Page</p>
-              <ProgressBar now={89} variant="success" className="mb-3" />
-              <p>Mobile Template</p>
-              <ProgressBar now={55} variant="warning" className="mb-3" />
-              <p>Backend API</p>
-              <ProgressBar now={66} variant="info" />
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-</>
-    );
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col lg={8}>
+            <Card className="m-3 p-1">
+              <Card.Body>
+                <Row className="text-start align-items-center">
+                  <Col sm={3} className="fw-bold px-4">
+                    Username
+                  </Col>
+                  <Col sm={9}>{profile.username || "None"}</Col>
+                </Row>
+                <hr className="my-3" />
+                <Row className="text-start align-items-center">
+                  <Col sm={3} className="fw-bold px-4">
+                    Email
+                  </Col>
+                  <Col sm={9}>{profile.email || "None"}</Col>
+                </Row>
+                <hr className="my-3" />
+                <Row className="text-start align-items-center">
+                  <Col sm={3} className="fw-bold px-4">
+                    Active
+                  </Col>
+                  <Col sm={6}>
+                    {profile.isActive ? "Activated" : "Inactivated"}
+                  </Col>
+                  <Col sm={3} className="d-flex justify-content-end">
+                    {!profile.isActive && (
+                      <Button
+                        variant="primary"
+                        className="px-4"
+                        onClick={handleShowModal}
+                      >
+                        Activate Account
+                      </Button>
+                    )}
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+            <EmailVerificationModal
+              show={showModal}
+              onHide={handleCloseModal}
+            />
+            <Card className="m-3 mt-4 p-1 text-start">
+              <Card.Body>
+                <Row className="text-center">
+                  <h4>
+                    {profile.isActive && !profile.hasPassword
+                      ? "Create new password"
+                      : "Change password"}
+                  </h4>
+                </Row>
+                <Form onSubmit={handlePasswordChange}>
+                  {!profile.hasPassword ? (
+                    ""
+                  ) : (
+                    <Form.Group className="mb-3">
+                      <Form.Label>Current Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="current"
+                        placeholder="Enter your current password"
+                        required={true}
+                      />
+                    </Form.Group>
+                  )}
+                  <Form.Group className="mb-3">
+                    <Form.Label>New Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="new"
+                      placeholder="Enter your new password"
+                      required={true}
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-4">
+                    <Form.Label>Confirm New Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="confirm"
+                      placeholder="Confirm your new password"
+                      required={true}
+                    />
+                  </Form.Group>
+                  <Row>
+                    <Col className="d-flex justify-content-end">
+                      <Button type="submit" variant="primary">
+                        &nbsp; Submit &nbsp;
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </>
+  );
 };
 
 export default ProfilePage;

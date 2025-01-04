@@ -18,3 +18,20 @@ body {
 .me-2 {
     margin-right: .5rem!important;
 }
+.warping {
+    white-space: normal;    
+    overflow-wrap: break-word; 
+  }
+
+  .btn-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close::before {
+    content: "X"; /* Replace with your desired symbol */
+    font-size: 1rem;
+    font-weight: bold;
+    color: rgb(0, 0, 0); /* Change to your preferred color */
+}
