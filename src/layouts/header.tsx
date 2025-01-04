@@ -53,7 +53,7 @@ export const Header = () => {
                                         Task Management
                                     </NavLink>
                                     <NavLink
-                                        to="/dashboard"
+                                        to="/analyze"
                                         className={({ isActive }) =>
                                             isActive
                                                 ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"

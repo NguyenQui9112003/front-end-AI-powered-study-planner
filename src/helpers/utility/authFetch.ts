@@ -28,14 +28,21 @@ const refreshToken = async (refresh_token: string) => {
 	}
 };
 
+export class AuthError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'AuthError';
+	}
+}
+
 export const authFetch = async (url: string, request: RequestInit) => {
 	const token = window.localStorage.getItem('token');
 
 	if (!token) {
-		return null;
+		throw new AuthError('No token found');
 	}
 
-	const parsedToken = token ? JSON.parse(token) : null;
+	const parsedToken = JSON.parse(token);
 	let accessToken = parsedToken.access_token;
 	const refresh_token = parsedToken.refresh_token;
 
@@ -44,35 +51,28 @@ export const authFetch = async (url: string, request: RequestInit) => {
 		Authorization: `Bearer ${accessToken}`,
 	};
 
-	console.log("request: ", request)
+	let response = await fetch(url, request);
 
-	try {
-		let response = await fetch(url, request);
+	if (!response.ok && response.status === 419) {
+		accessToken = await refreshToken(refresh_token);
 
-		if (!response.ok && response.status === 419) {
-			accessToken = await refreshToken(refresh_token);
+		if (!accessToken) {
+			throw new AuthError('No access token found');
+		}
 
-			if (!accessToken) {
-				return null;
-			}
+		request.headers = {
+			...request.headers,
+			Authorization: `Bearer ${accessToken}`,
+		};
 
-			request.headers = {
-				...request.headers,
-				Authorization: `Bearer ${accessToken}`,
-			};
+		response = await fetch(url, request);
 
-			response = await fetch(url, request);
-
-			if (!response.ok) {
-				return null;
-			}
-
-			return response;
+		if (!response.ok) {
+			throw new AuthError('Request failed');
 		}
 
 		return response;
-	} catch (error) {
-		console.error('Error fetching:', error);
-		return null;
 	}
+
+	return response;
 };
