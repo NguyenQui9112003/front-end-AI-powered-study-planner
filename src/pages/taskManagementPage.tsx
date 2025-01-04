@@ -62,9 +62,9 @@ export const TaskManagementPage = () => {
 
 	// create task modal
 	const handleCreateTask = (task: Task) => {
-		setData([...data, task]);
+		setDataFetch([...dataFetch, task]);
 		return () => {
-			setData(data);
+			setDataFetch(dataFetch);
 		};
 	};
 
@@ -92,10 +92,6 @@ export const TaskManagementPage = () => {
 		);
 	};
 
-	useEffect(() => {
-		fetchTasks();
-	}, []);
-
 	const fetchTasks = async () => {
 		try {
 			const response = await authFetch(
@@ -116,7 +112,7 @@ export const TaskManagementPage = () => {
 
 			const data = await response.json();
 			setDataFetch(data);
-			handleFilterAndSort(data);
+			applyFilterSortSearch(data);
 		} catch (error) {
 			if (error instanceof AuthError) {
 				console.error(error);
@@ -134,7 +130,7 @@ export const TaskManagementPage = () => {
 					'Content-type': 'application/json',
 				},
 				body: JSON.stringify({
-					username: decodedToken.username,
+					username: user,
 					taskName,
 				}),
 			});
@@ -160,7 +156,7 @@ export const TaskManagementPage = () => {
 	};
 
 	const applyFilterSortSearch = (data: Task[]) => {
-		let baseData = [...data]; 
+		let baseData = [...data];
 		// filter
 		if (filterOption !== 'Filter: Default') {
 			baseData = baseData.filter((item) => {
@@ -275,7 +271,7 @@ export const TaskManagementPage = () => {
 					/>
 
 					<button
-						onClick={() => handleFilterAndSort()}
+						onClick={() => applyFilterSortSearch(dataFetch)}
 						className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
 					>
 						Sort & Filter
@@ -307,12 +303,7 @@ export const TaskManagementPage = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{(searchResult.length > 0
-						? searchResult
-						: processedData.length > 0
-						? processedData
-						: []
-					).map((task) => (
+					{processedData.map((task) => (
 						<tr key={task._id} className="hover:bg-gray-50">
 							<td className="border border-gray-200 px-4 py-2">
 								{task.taskName}
@@ -365,91 +356,23 @@ export const TaskManagementPage = () => {
 				</tbody>
 			</table>
 
-			<Modal isOpen={openCreateTaskModal} onClose={handleCloseModal}>
-				<Modal.Header>
-					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
-						Create Your Task
-					</div>
-				</Modal.Header>
-				<Modal.Body>
-					<CreateTaskForm
-						ref={formRef}
-						user={decodedToken.username}
-					></CreateTaskForm>
-				</Modal.Body>
-				<Modal.Footer>
-					<div className="flex justify-end">
-						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
-							Close
-						</Modal.DismissButton>
-						<button
-							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
-							onClick={handleCreateTask}
-						>
-							Confirm
-						</button>
-					</div>
-				</Modal.Footer>
-			</Modal>
-
-			<Modal isOpen={openUpdateTaskModal} onClose={handleCloseModal}>
-				<Modal.Header>
-					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
-						Update Your Task
-					</div>
-				</Modal.Header>
-				<Modal.Body>
-					<UpdateTaskForm
-						ref={formRef}
-						defaultValues={defaultValues}
-						onSave={handleSave}
-						user={decodedToken.username}
-					></UpdateTaskForm>
-				</Modal.Body>
-				<Modal.Footer>
-					<div className="flex justify-end">
-						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
-							Close
-						</Modal.DismissButton>
-						<button
-							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
-							onClick={handleUpdateTask}
-						>
-							Save Changes
-						</button>
-					</div>
-				</Modal.Footer>
-			</Modal>
-
+			<CreateTaskModal
+				isOpen={openCreateTaskModal}
+				onClose={handleCloseModal}
+				onCreate={handleCreateTask}
+			/>
+			<UpdateTaskModal
+				isOpen={openUpdateTaskModal}
+				onClose={handleCloseModal}
+				defaultValues={defaultValues}
+				onSave={handleSave}
+			/>
+			<TimerModal
+				isOpen={openTimerModal}
+				onClose={handleCloseModal}
+				defaultValues={defaultValues}
+			/>
 			<AISuggestion tasks={processedData} />
-
-			<Modal isOpen={openTimerModal} onClose={handleCloseModal}>
-				<Modal.Header>
-					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
-						Timer&nbsp;&nbsp;&nbsp;
-					</div>
-				</Modal.Header>
-				<Modal.Body>
-					<TimerForm
-						ref={formRef}
-						defaultValues={defaultValues}
-						user={decodedToken.username}
-					></TimerForm>
-				</Modal.Body>
-				<Modal.Footer>
-					<div className="flex justify-end mt-3">
-						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
-							Close
-						</Modal.DismissButton>
-						<button
-							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
-							onClick={handleSession}
-						>
-							End
-						</button>
-					</div>
-				</Modal.Footer>
-			</Modal>
 		</div>
 	);
 };
