@@ -1,5 +1,5 @@
 export interface Task {
-    _id?: string;
+    _id?: number;
     taskName: string;
     description: string;
     priorityLevel: string;

@@ -1,19 +1,15 @@
-import { ReactNode  } from 'react';
+import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './authProvider';
 import { getTokenData } from '../utility/tokenData';
 
 interface PrivateRouteProps {
-	element: ReactNode;
+    element: ReactNode;
 }
 
 const PrivateRoute = ({ element }: PrivateRouteProps) => {
-	const { isLoading, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
     var isActive;
-    
-    if (isLoading) {
-        return <p>Loading...</p>;
-    }
 
     if (!isAuthenticated) {
         return <Navigate to="/signIn" replace />;
@@ -25,7 +21,7 @@ const PrivateRoute = ({ element }: PrivateRouteProps) => {
         return <Navigate to="/profile" replace />;
     }
 
-	return <>{element}</>;
+    return <>{element}</>;
 };
 
 export default PrivateRoute;

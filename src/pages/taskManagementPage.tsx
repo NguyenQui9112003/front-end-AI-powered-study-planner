@@ -96,7 +96,7 @@ export const TaskManagementPage = () => {
 
 	// render task table
 	const handleSave = (updatedTask: any) => {
-		if (currentTask) updateTask(updatedTask, currentTask._id); // Cập nhật bảng
+		if (currentTask) updateTask(currentTask._id, updatedTask); // Cập nhật bảng
 		setUpdateTaskOpenModal(false); // Đóng modal
 	};
 
@@ -130,7 +130,7 @@ export const TaskManagementPage = () => {
 			setDataFetch(data);
 			setProcessedData(data);
 		} catch (error) {
-			console.error('Error fetching task', error);
+			console.error('Error fetching profile:', error);
 		}
 	};
 
@@ -299,7 +299,6 @@ export const TaskManagementPage = () => {
 							<td className="border border-gray-200 px-4 py-2">
 								{task.status}
 							</td>
-
 
 							<td className="border border-gray-200 px-4 py-2">
 								<button

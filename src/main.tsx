@@ -13,7 +13,6 @@ import { LoginForm } from './components/features/auth/LoginForm';
 import { RegisterForm } from './components/features/auth/RegisterForm';
 import { ProfilePage } from './pages/profilePage';
 import { TaskManagementPage } from './pages/taskManagementPage';
-import AnalyzePage from './pages/analyzePage';
 
 const router = createBrowserRouter(
   [
@@ -50,11 +49,6 @@ const router = createBrowserRouter(
     {
       path: "/profile",
       element: <ProfilePage />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/analyze",
-      element: <AnalyzePage />,
       errorElement: <Error />,
     },
   ],
