@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Modal, Button, Form } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../../css/profile.css";
 import bcrypt from 'bcryptjs';
+import { useAuth } from '../../../helpers/context/authProvider';
 
-const EmailVerificationModal = ({ show, onHide }) => {
+const EmailVerificationModal = ({ show, onHide }: any) => {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1); // Step 1: Email input, Step 2: OTP input
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState({from_mail: "", entered: ""});
     const [error, setError] = useState("");
+    const { logout } = useAuth();
 
     const handleEmailSubmit = async () => {
         if (!email) {
@@ -63,12 +67,14 @@ const EmailVerificationModal = ({ show, onHide }) => {
                 });
                 if (response.ok) {
                     alert("Account verified");
+                    onHide();
+                    logout();
+                    navigate(`/signIn`);
                 } else {
                     const errorData = await response.json();
                     alert(`Error: ${errorData.message || "Can't send OTP"}`);
+                    onHide();
                 }
-
-                onHide(); 
             } else {
                 console.log("OTP is incorrect");
                 setError("The OTP you entered is incorrect.");

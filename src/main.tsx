@@ -13,6 +13,7 @@ import { LoginForm } from './components/features/auth/LoginForm';
 import { RegisterForm } from './components/features/auth/RegisterForm';
 import { ProfilePage } from './pages/profilePage';
 import { TaskManagementPage } from './pages/taskManagementPage';
+import { AnalyzePage } from './pages/analyzePage';
 
 const router = createBrowserRouter(
   [
@@ -33,7 +34,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/home",
-      element: <App />,
+      element: <PrivateRoute element={<App />} />,
       errorElement: <Error />,
     },
     {
@@ -41,11 +42,11 @@ const router = createBrowserRouter(
       element: <PrivateRoute element={<TaskManagementPage />} />,
       errorElement: <Error />,
     },
-    // {
-    //   path: "/analyze",
-    //   element: <PrivateRoute element={<AnalyzePage />} />,
-    //   errorElement: <Error />,
-    // },
+    {
+      path: "/analyze",
+      element: <PrivateRoute element={<AnalyzePage />} />,
+      errorElement: <Error />,
+    },
     {
       path: "/profile",
       element: <ProfilePage />,

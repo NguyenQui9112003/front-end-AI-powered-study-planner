@@ -382,7 +382,6 @@ export const TaskManagementPage = () => {
 					</div>
 				</Modal.Footer>
 			</Modal> */}
-
 		</div >
 	);
 }
