@@ -13,7 +13,7 @@ import { Dropdown } from '../components/common/dropdown.tsx';
 
 import Header from '../layouts/header.tsx';
 
-import { TimerForm } from '@/components/features/task-management/TimerForm.tsx';
+// import { TimerForm } from '@/components/features/task-management/TimerForm.tsx';
 import { CreateTaskForm } from '../components/features/task-management/CreateTaskForm.tsx';
 import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
 
@@ -27,7 +27,7 @@ export const TaskManagementPage = () => {
 
 	const [openCreateTaskModal, setCreateTaskOpenModal] = useState(false);
 	const [openUpdateTaskModal, setUpdateTaskOpenModal] = useState(false);
-	const [openTimerModal, setTimerOpenModal] = useState(false);
+	// const [openTimerModal, setTimerOpenModal] = useState(false);
 	const formRef = useRef<{ submitForm: () => void } | null>(null);
 
 	const [sortOption, setSortOption] = useState<string | null>("Sort");
@@ -52,9 +52,10 @@ export const TaskManagementPage = () => {
 			setCreateTaskOpenModal(false);
 		} else if (openUpdateTaskModal == true) {
 			setUpdateTaskOpenModal(false);
-		} else if (openTimerModal == true) {
-			setTimerOpenModal(false);
 		}
+		// } else if (openTimerModal == true) {
+		// 	setTimerOpenModal(false);
+		// }
 		fetchTasks();
 	};
 
@@ -80,18 +81,18 @@ export const TaskManagementPage = () => {
 	};
 
 	// focus timer modal
-	const handleTimerModal = (task: any) => {
-		setCurrentTask(task);
-		setTimerOpenModal(true);
-	};
+	// const handleTimerModal = (task: any) => {
+	// 	setCurrentTask(task);
+	// 	setTimerOpenModal(true);
+	// };
 
-	const handleSession = () => {
-		if (formRef.current) {
-			formRef.current.submitForm();
-			fetchTasks();
-		}
-		setTimerOpenModal(false);
-	};
+	// const handleSession = () => {
+	// 	if (formRef.current) {
+	// 		formRef.current.submitForm();
+	// 		fetchTasks();
+	// 	}
+	// 	setTimerOpenModal(false);
+	// };
 
 	// render task table
 	const handleSave = (updatedTask: any) => {
@@ -271,7 +272,7 @@ export const TaskManagementPage = () => {
 						<th className="border border-gray-200 px-2 py-2 w-[96px]">
 							Status
 						</th>
-						<th className="border border-gray-200 px-2 py-2 w-[192px]">
+						<th className="border border-gray-200 px-2 py-2 w-[200px]">
 							Action
 						</th>
 					</tr>
@@ -312,11 +313,11 @@ export const TaskManagementPage = () => {
 									Delete
 								</button>
 
-								<button
+								{/* <button
 									onClick={() => handleTimerModal(task)}
 									className="bg-green-500 text-white px-2 py-1 rounded-md ml-2 w-[70px]">
 									Timer
-								</button>
+								</button> */}
 							</td>
 						</tr>
 					))}
@@ -367,7 +368,7 @@ export const TaskManagementPage = () => {
 
 			<AISuggestion tasks={processedData} />
 
-			<Modal isOpen={openTimerModal} onClose={handleCloseModal}>
+			{/* <Modal isOpen={openTimerModal} onClose={handleCloseModal}>
 				<Modal.Header>
 					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">Timer&nbsp;&nbsp;&nbsp;</div>
 				</Modal.Header>
@@ -380,7 +381,7 @@ export const TaskManagementPage = () => {
 						<button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1" onClick={handleSession}>End</button>
 					</div>
 				</Modal.Footer>
-			</Modal>
+			</Modal> */}
 
 		</div >
 	);
