@@ -17,7 +17,7 @@ export const ProfilePage = () => {
     hasPassword: true,
   });
   const [showModal, setShowModal] = useState(false);
-
+// GET PROFILE INFORMATION
   useEffect(() => {
     const fetchProfile = async () => {
       const token = window.localStorage.getItem("token");
@@ -78,7 +78,7 @@ export const ProfilePage = () => {
 
     fetchProfile();
   }, []);
-
+// CHANGE PASSWORD
   const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -128,7 +128,59 @@ export const ProfilePage = () => {
       alert("An unexpected error occurred.");
     }
   };
+// CREATE PASSWORD
+  const handlePasswordCreate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
 
+    const newPassword =
+      (form.elements.namedItem("new") as HTMLInputElement)?.value || "";
+    const confirmPassword =
+      (form.elements.namedItem("confirm") as HTMLInputElement)?.value || "";
+
+    console.log(form);
+
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirmation do not match.");
+      return;
+    }
+
+    try {
+      const token = JSON.parse(window.localStorage.getItem("token") || "{}");
+      const response = await fetch(
+        "http://localhost:3000/auth/createPassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.access_token}`,
+          },
+          body: JSON.stringify({
+            email: profile.email,
+            newPassword,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Password create successfully!");
+        profile.hasPassword = true;
+        form.reset();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || "Failed to create password."}`);
+      }
+    } catch (error) {
+      console.error("Error creating password:", error);
+      alert("An unexpected error occurred.");
+    }
+  };  
+// UPDATE INFO AFTER VERIFY
+  // const handleAccountVerified = () => {
+  //   setProfile((prevProfile) => ({ ...prevProfile, isActive: true }));
+  //   handleCloseModal(); // Close the modal
+  // };
+// HANDLE MODAL
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
@@ -137,6 +189,7 @@ export const ProfilePage = () => {
       <Header />
       <Container>
         <Row>
+          {/* AVATAR & USERNAME */}
           <Col lg={4}>
             <Card className="m-3 p-1">
               <Card.Body>
@@ -154,7 +207,10 @@ export const ProfilePage = () => {
               </Card.Body>
             </Card>
           </Col>
+
+          {/* INFORMATION & CHANGE PASSWORD */}
           <Col lg={8}>
+          {/* INFORMATION */}
             <Card className="m-3 p-1">
               <Card.Body>
                 <Row className="text-start align-items-center">
@@ -175,10 +231,10 @@ export const ProfilePage = () => {
                   <Col sm={3} className="fw-bold px-4">
                     Active
                   </Col>
-                  <Col sm={6}>
+                  <Col sm={3}>
                     {profile.isActive ? "Activated" : "Inactivated"}
                   </Col>
-                  <Col sm={3} className="d-flex justify-content-end">
+                  <Col sm={6} className="d-flex justify-content-end">
                     {!profile.isActive && (
                       <Button
                         variant="primary"
@@ -192,20 +248,26 @@ export const ProfilePage = () => {
                 </Row>
               </Card.Body>
             </Card>
+
+          {/* ACCOUNT VERIFY MODAL */}
             <EmailVerificationModal
               show={showModal}
               onHide={handleCloseModal}
+              email={profile.email}
+              // onAccountVerified={handleAccountVerified}
             />
+            
+            {/* CHANGE/CREATE PASSWORD */}
             <Card className="m-3 mt-4 p-1 text-start">
               <Card.Body>
                 <Row className="text-center">
                   <h4>
-                    {profile.isActive && !profile.hasPassword
+                    {!profile.hasPassword
                       ? "Create new password"
                       : "Change password"}
                   </h4>
                 </Row>
-                <Form onSubmit={handlePasswordChange}>
+                <Form onSubmit={profile.hasPassword ? handlePasswordChange : handlePasswordCreate}>
                   {!profile.hasPassword ? (
                     ""
                   ) : (
