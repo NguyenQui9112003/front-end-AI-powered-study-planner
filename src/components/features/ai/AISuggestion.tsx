@@ -1,4 +1,4 @@
-import { authFetch } from '@/helpers/utility/authFetch';
+import { AuthError, authFetch } from '@/helpers/utility/authFetch';
 import { Button } from '../../../components/common/button';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -36,29 +36,38 @@ export const AISuggestion = (props: AISuggestionProps) => {
 
 		console.log(tasks);
 
-		const response = await authFetch('http://localhost:3000/ai/schedule', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(tasks),
-		});
+		try {
+			const response = await authFetch(
+				'http://localhost:3000/ai/schedule',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(tasks),
+				}
+			);
 
-		if (!response) {
-			navigate('/signIn');
-			return;
+			if (!response) {
+				navigate('/signIn');
+				return;
+			}
+	
+			const feedback: AIScheduleFeedback = await response.json();
+			let feedbackString = feedback.feedback.overall + '\n\n';
+			let index = 1;
+	
+			for (const suggestion of feedback.feedback.suggestions) {
+				feedbackString += index + '. ' + suggestion.suggestion + '\n\n';
+				index++;
+			}
+	
+			setAIResponse(feedbackString);
+		} catch (error) {
+			if (error instanceof AuthError) {
+				navigate('/signIn');
+			}
 		}
-
-		const feedback: AIScheduleFeedback = await response.json();
-		let feedbackString = feedback.feedback.overall + '\n\n';
-		let index = 1;
-
-		for (const suggestion of feedback.feedback.suggestions) {
-			feedbackString += index + '. ' + suggestion.suggestion + '\n\n';
-			index++;
-		}
-
-		setAIResponse(feedbackString);
 
 		// response.json().then((res) => {
 		// 	setAIResponse(res);
