@@ -162,77 +162,69 @@ export const UpdateTaskForm = ({
 						)}
 					</div>
 
-					<div className="mb-1">
-						<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
-							Start date
-						</label>
-						<input
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							id="startDate"
-							type="datetime-local"
-							{...register('startDate', {
-								required: 'This field is required',
-							})}
-						/>
-						{errors.startDate && (
-							<div className="text-xs text-left mt-1 text-red-700">
-								{errors.startDate.message}
-							</div>
-						)}
-					</div>
+						<div className="mb-1">
+							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
+								Start date
+							</label>
+							<input
+								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="startDate"
+								type="datetime-local"
+								{...register('startDate', {
+									required: 'This field is required',
+								})}
+							/>
+							{errors.startDate && (
+								<div className="text-xs text-left mt-1 text-red-700">
+									{errors.startDate.message}
+								</div>
+							)}
+						</div>
 
-					<div className="mb-1">
-						<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
-							End date
-						</label>
-						<input
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							id="endDate"
-							type="datetime-local"
-							{...register('endDate', {
-								required: 'This field is required',
-							})}
-						/>
-						{errors.endDate && (
-							<div className="text-xs text-left mt-1 text-red-700">
-								{errors.endDate.message}
-							</div>
-						)}
-					</div>
+						<div className="mb-1">
+							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
+								Estimated time (HH:MM)
+							</label>
+							<input
+								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="estimatedTime"
+								type="text"
+								{...register('estimatedTime', {
+									required: 'This field is required',
+								})}
+							/>
+							{errors.estimatedTime && (
+								<div className="text-xs text-left mt-1 text-red-700">
+									{errors.estimatedTime.message}
+								</div>
+							)}
+						</div>
 
-					<div className="mb-1">
-						<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
-							Status
-						</label>
-						<select
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							id="status"
-							{...register('status', {
-								required: 'This field is required',
-							})}
-							style={{
-								backgroundImage:
-									"url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22gray%22><path fill-rule=%22evenodd%22 d=%22M10 14a1 1 0 01-.707-.293l-3-3a1 1 0 111.414-1.414L10 11.586l2.293-2.293a1 1 0 011.414 1.414l-3 3A1 1 0 0110 14z%22 clip-rule=%22evenodd%22 /></svg>')",
-								backgroundPosition: 'right 0.3rem center',
-								backgroundRepeat: 'no-repeat',
-								backgroundSize: '2rem 2rem',
-							}}
-						>
-							<option value="">Select</option>
-
-							<option value="Todo">Todo</option>
-							<option value="In Progress">In Progress</option>
-							<option value="Completed">Completed</option>
-							<option value="Expired">Expired</option>
-						</select>
-						{errors.status && (
-							<div className="text-xs text-left mt-1 text-red-700">
-								{errors.status.message}
-							</div>
-						)}
-					</div>
-				</form>
-			</div>
-		</>
-	);
-};
+						<div className="mb-1">
+							<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
+								Status
+							</label>
+							<select
+								className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="status"
+								{...register('status', {
+									required: 'This field is required',
+								})}
+							>
+								<option value="">Select</option>
+								<option value="Completed">Completed</option>
+								<option value="In Process">In Process</option>
+								<option value="Todo">Todo</option>
+							</select>
+							{errors.status && (
+								<div className="text-xs text-left mt-1 text-red-700">
+									{errors.status.message}
+								</div>
+							)}
+						</div>
+					</form>
+				</div>
+			</>
+		);
+	}
+);

@@ -1,34 +1,23 @@
-import 'react-toastify/dist/ReactToastify.css';
-import { toast, ToastContainer } from 'react-toastify';
+import { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useEffect } from 'react';
-import { Task } from '@/types/taskType';
-import { AuthError, authFetch } from '@/helpers/utility/authFetch';
-import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-
-type OnRevert = () => void;
-export type OnCreateTask = (task: Task) => OnRevert;
-
-
-interface CreateTaskFormProps {
-	onCreate: OnCreateTask;
-}
-
-export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const CreateTaskForm = forwardRef(({ user }: any, ref) => {
 	type Inputs = {
-		username: string;
+		email: string; // set user:props from parent
 		taskName: string;
 		description: string;
 		priorityLevel: string;
-		timeFocus: string;
 		startDate: Date | null;
 		endDate: Date | null;
 		status: string;
 	};
 
-	const navigate = useNavigate();
-
+	useImperativeHandle(ref, () => ({
+		submitForm: () => handleSubmit(onSubmit)(),
+	}));
 	const {
 		register,
 		handleSubmit,
@@ -49,44 +38,34 @@ export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
 		}
 	}, [isSubmitSuccessful, reset]);
 
+	useImperativeHandle(ref, () => ({
+		submitForm: () => handleSubmit(onSubmit)(),
+	}));
+
 	const onSubmit: SubmitHandler<Inputs> = async (data) => {
-		data.timeFocus = '0';
-        const onRevert = onCreate(data);
+		// set user
+		data.email = user;
 
 		try {
-			const response = await authFetch(
-				'http://localhost:3000/tasks/create',
-				{
-					method: 'POST',
-					headers: {
-						'Content-type': 'application/json',
-					},
-					body: JSON.stringify(data),
-				}
-			);
+			const response = await fetch('http://localhost:3000/tasks/create', {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
-                onRevert();
-
 				const errorData = await response.json();
 				throw new Error(errorData.message || 'Server error');
 			} else {
 				toast.success('Task created successfully', {
 					position: 'top-right',
 				});
-
-                onRevert();
-				onCreate(await response.json());
 			}
 		} catch (error) {
-			onRevert();
-			
-            console.error('Server: Failed request.');
-			
-			if (error instanceof AuthError) {
-				navigate('/signIn');
-			}
-			else if (error instanceof Error) {
+			console.error('Server: Failed request.');
+			if (error instanceof Error) {
 				toast.error(error.message, {
 					position: 'top-right',
 				});
@@ -98,12 +77,28 @@ export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
 		}
 	};
 
+	useEffect(() => {
+		if (isSubmitSuccessful) {
+			reset({
+				taskName: '',
+				description: '',
+				priorityLevel: '',
+				startDate: null,
+				endDate: null,
+				status: '',
+			});
+		}
+	}, [isSubmitSuccessful, reset]);
+
+	useImperativeHandle(ref, () => ({
+		submitForm: () => handleSubmit(onSubmit)(),
+	}));
+
 	return (
 		<>
 			<ToastContainer />
 			<div className="w-full max-w-2xl mx-auto">
 				<form
-                    id="create-task-form"
 					action="task/create"
 					className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
 					onSubmit={handleSubmit(onSubmit)}
@@ -148,7 +143,7 @@ export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
 
 					<div className="mb-1">
 						<label className="block text-gray-700 text-sm font-bold mb-2 text-left">
-							Priority
+							Priority level
 						</label>
 						<select
 							className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -234,7 +229,6 @@ export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
 						>
 							<option value="">Select</option>
 							<option value="Todo">Todo</option>
-							<option value="In Progress">In Progress</option>
 							<option value="Completed">Completed</option>
 							<option value="Expired">Expired</option>
 						</select>
@@ -248,4 +242,4 @@ export const CreateTaskForm = ({ onCreate }: CreateTaskFormProps) => {
 			</div>
 		</>
 	);
-};
+});

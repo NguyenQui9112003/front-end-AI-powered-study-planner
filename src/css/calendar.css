@@ -1,79 +1,67 @@
 .fc {
-    border-radius: 5px;
-  }
-  /* event inside calendar */
-  .fc-event, .fc-daygrid-event-harness {
-    background-color: rgba(0, 0, 0, 0);
-    /* color: white; */
-    border: none;
-  }
-  .draggable-item {
-    background-color: #3182ce;
-    color: white;
-    padding: px;
-    border: 1px solid;
-    margin: 12px;
-    cursor: pointer;
-  }
-  /* 
-  .external-events {
-    width: 200px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
-  
-  .external-event {
-    margin: 5px 0;
-    padding: 10px;
-    background-color: #8fb7df;
-    color: white;
-    cursor: grab;
-    text-align: center;
-  } */
-  .calendar-space {
-    display: flex; /* Use flexbox to align items in a row */
-    justify-content: space-between; /* Optional: adds space between divs */
-    align-items: center; /* Optional: vertically aligns items */
-    gap: 10px; /* Adds spacing between divs */
-  }
-  
-  .calendar-container {
-    flex: 3;
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin: 5px;
-    font-family: Trebuchet MS;
-    /* height: 80vh; */
-    /* border: 1px solid #000; */
-    /* background-color: #f4f4f4; */
-    /* text-align: center; */
-  }
-  .taskbar-container {
-    flex: 1;
-    padding: 10px;
-    /* border: 1px solid #000; */
-    background-color: black;
-    color: rgb(197, 228, 255);
-    /* text-align: center; */
-    font-family: Trebuchet MS;
-    /* height: 100vh; */
-  }
-  .draggable-item {
-    padding: 8px;
-  }
-  .task-item {
-    padding: 3px 5px;
-    margin: 1px;
-    border: 1px;
-  }
-  .expired {
-    background-color: gray;
-    border-radius: 5px;
-  }
-  .todo {
-    background-color: #3182ce;
-    border-radius: 5px;
-  }
-  
+  border-radius: 5px;
+}
+/* event inside calendar */
+.fc-event, .fc-daygrid-event-harness {
+  background-color: rgba(0, 0, 0, 0);
+  /* color: white; */
+  border: none;
+}
+.draggable-item {
+  background-color: #3182ce;
+  color: white;
+  padding: px;
+  border: 1px solid;
+  margin: 12px;
+  cursor: pointer;
+}
+.calendar-space {
+  display: flex; /* Use flexbox to align items in a row */
+  justify-content: space-between; /* Optional: adds space between divs */
+  align-items: center; /* Optional: vertically aligns items */
+  gap: 10px; /* Adds spacing between divs */
+}
+
+.calendar-container {
+  flex: 3;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin: 5px;
+  font-family: Trebuchet MS;
+  /* height: 80vh; */
+  /* border: 1px solid #000; */
+  /* background-color: #f4f4f4; */
+  /* text-align: center; */
+}
+.taskbar-container {
+  flex: 1;
+  padding: 10px;
+  /* border: 1px solid #000; */
+  background-color: black;
+  color: rgb(197, 228, 255);
+  /* text-align: center; */
+  font-family: Trebuchet MS;
+  /* height: 100vh; */
+}
+.draggable-item {
+  padding: 8px;
+}
+.task-item {
+  padding: 3px 5px;
+  margin: 1px;
+  border: 1px;
+}
+.fc-event {
+  border-radius: 5px;
+  color: white;
+
+}
+.fc-event:has(.todo) {
+  background-color: #3182ce !important; 
+
+}
+
+
+.fc-event:has(.expired) {
+  background-color: gray !important; 
+}

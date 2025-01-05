@@ -7,18 +7,11 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { Task } from '@/types/taskType.tsx';
 import { getTokenData } from '@/helpers/utility/tokenData.ts';
-
 import { Dropdown } from '../components/common/dropdown.tsx';
 
 import Header from '../layouts/header.tsx';
 
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
-import { CreateTaskModal } from '@/components/features/task-management/CreateTaskModal.tsx';
-import { UpdateTaskModal } from '@/components/features/task-management/UpdateTaskModal.tsx';
-import { TimerModal } from '@/components/features/task-management/TimerModal.tsx';
-import { AuthError, authFetch } from '@/helpers/utility/authFetch.ts';
-import { useNavigate } from 'react-router-dom';
-
 
 export const TaskManagementPage = () => {
 	const user = getTokenData().username;
@@ -254,7 +247,6 @@ export const TaskManagementPage = () => {
 					<Dropdown
 						options={['Default', 'Ascending', 'Descending']}
 						onSelect={(option) => setSortOption(option)}
-						placeholder="Sort"
 						value={sortOption}
 					/>
 
@@ -356,23 +348,108 @@ export const TaskManagementPage = () => {
 				</tbody>
 			</table>
 
-			<CreateTaskModal
-				isOpen={openCreateTaskModal}
-				onClose={handleCloseModal}
-				onCreate={handleCreateTask}
-			/>
-			<UpdateTaskModal
-				isOpen={openUpdateTaskModal}
-				onClose={handleCloseModal}
-				defaultValues={defaultValues}
-				onSave={handleSave}
-			/>
-			<TimerModal
-				isOpen={openTimerModal}
-				onClose={handleCloseModal}
-				defaultValues={defaultValues}
-			/>
+			<Modal isOpen={openCreateTaskModal} onClose={handleCloseModal}>
+				<Modal.Header>
+					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
+						Create Your Task
+					</div>
+				</Modal.Header>
+				<Modal.Body>
+					<CreateTaskForm
+						ref={formRef}
+						user={decodedToken.email}
+					></CreateTaskForm>
+				</Modal.Body>
+				<Modal.Footer>
+					<div className="flex justify-end">
+						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
+							Close
+						</Modal.DismissButton>
+						<button
+							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
+							onClick={handleConfirm}
+						>
+							Confirm
+						</button>
+					</div>
+				</Modal.Footer>
+			</Modal>
+
+			<Modal isOpen={openUpdateTaskModal} onClose={handleCloseModal}>
+				<Modal.Header>
+					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
+						Update Your Task
+					</div>
+				</Modal.Header>
+				<Modal.Body>
+					<UpdateTaskForm
+						ref={formRef}
+						defaultValues={defaultValues}
+						onSave={handleSave}
+					></UpdateTaskForm>
+				</Modal.Body>
+				<Modal.Footer>
+					<div className="flex justify-end">
+						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
+							Close
+						</Modal.DismissButton>
+						<button
+							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
+							onClick={handleConfirm}
+						>
+							Save Changes
+						</button>
+					</div>
+				</Modal.Footer>
+			</Modal>
+
 			<AISuggestion tasks={processedData} />
+
+			{/* Add new Task */}
+
+			{/* <div className="mt-4 flex space-x-2">
+                <input
+                    type="text"
+                    placeholder="Task Name"
+                    value={newTask.taskName}
+                    onChange={(e) => setNewTask({ ...newTask, taskName: e.target.value })}
+                    className="border border-gray-300 rounded-md px-4 py-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Description"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    className="border border-gray-300 rounded-md px-4 py-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Priority Level"
+                    value={newTask.priorityLevel}
+                    onChange={(e) => setNewTask({ ...newTask, priorityLevel: e.target.value })}
+                    className="border border-gray-300 rounded-md px-4 py-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Estimated Time"
+                    value={newTask.estimatedTime}
+                    onChange={(e) => setNewTask({ ...newTask, estimatedTime: e.target.value })}
+                    className="border border-gray-300 rounded-md px-4 py-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Status"
+                    value={newTask.status}
+                    onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                    className="border border-gray-300 rounded-md px-4 py-2"
+                />
+                <button
+                    onClick={addTask}
+                    className="bg-green-500 text-white px-4 py-2 rounded-md"
+                >
+                    Add
+                </button>
+            </div> */}
 		</div>
 	);
 };
