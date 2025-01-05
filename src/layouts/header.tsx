@@ -29,7 +29,7 @@ export const Header = () => {
                             <span className="flex shrink-0 items-center">
                                 <img
                                     className="h-8 w-auto"
-                                    src="..\public\assets\ailogo.png"
+                                    src="..\assets\ailogo.png"
                                     alt="Logo"/>
                             </span>
 
@@ -96,7 +96,7 @@ export const Header = () => {
                                         <span className="sr-only">Open user menu</span>
                                         <img
                                             className="h-8 w-8"
-                                            src=""
+                                            src="../../assets/user.png"
                                             alt="avatar"
                                         />
                                     </button>
