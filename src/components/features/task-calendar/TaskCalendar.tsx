@@ -137,7 +137,7 @@ const TaskCalendar: React.FC = () => {
       });
 
       if (response.ok) {
-        alert("Focus time end");
+        // alert("Focus time end");
       } else if (response.status === 419) {
         accessToken = await getRefreshToken(refreshToken);
         response = await fetch('https://be-ai-study-planner.onrender.com/tasks/update', {
