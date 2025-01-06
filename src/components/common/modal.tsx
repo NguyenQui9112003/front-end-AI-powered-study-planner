@@ -78,7 +78,7 @@ const ModalHeader = ({ children }: ModalSectionProps) => {
         <div className="react-modal-header flex flex-row justify-between items-center">
             <div className="flex-none w-14 h-14"></div> 
             <div className="react-modal-title">{children}</div>
-            <DismissButton className="btn-close font-bold">&times;</DismissButton>
+            <DismissButton className="modal-btn-close font-bold">&times;</DismissButton>
         </div>
     );
 };
