@@ -81,12 +81,10 @@ const TaskCalendar: React.FC = () => {
           }
         );
 
-        if (response.ok) {
-          console.log("Load schedule success")
-        } else {
+        if (!response.ok) {
           navigate("/signIn");
           alert("Session auth expired");
-        }
+        } 
       }
       if (!response.ok) {
         // Navigate to sign-in page on authorization failure
@@ -151,12 +149,10 @@ const TaskCalendar: React.FC = () => {
           body: JSON.stringify(data),
         })
 
-        if (response.ok) {
-          alert("Focus time end");
-        } else {
+        if (!response.ok) {
           navigate("/signIn");
           alert("Session auth expired");
-        }
+        } 
       }
 
       if (!response.ok) {
