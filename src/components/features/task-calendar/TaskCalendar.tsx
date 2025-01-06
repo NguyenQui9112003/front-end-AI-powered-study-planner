@@ -222,8 +222,8 @@ const TaskCalendar: React.FC = () => {
           droppable={true}
           events={tasks.map((task) => ({
             ...task,
-            start: task.startDate, // Map startDate to start
-            end: task.endDate,     // Map endDate to end
+            start: task.startDate ? new Date(task.startDate) : new Date(),
+            end: task.endDate ? new Date(task.endDate) : new Date(),
           }))}
           eventContent={renderTaskContent}
           eventChange={changeTaskByDragging}
