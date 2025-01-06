@@ -63,6 +63,7 @@ const TaskCalendar: React.FC = () => {
           taskName: task.taskName,
           start: task.startDate,
           end: task.endDate,
+          timeFocus: task.timeFocus,
           status: task.status,
           description: task.description,
           priorityLevel: task.priorityLevel,
@@ -179,8 +180,21 @@ const TaskCalendar: React.FC = () => {
   const handleTimer = (eventInfo: any) => {
     const task = tasks.find((t) => t._id === eventInfo.event.extendedProps._id);
     if (task) {
-      setSelectedTask(task);
-      setTimerOpenModal(true);
+      setSelectedTask({
+        _id: task._id,
+        taskName: task.taskName,
+        description: task.description,
+        priorityLevel: task.priorityLevel,
+        timeFocus: task.timeFocus,
+        startDate: task.start ? new Date(task.start) : null,
+        endDate: task.end ? new Date(task.end) : null,
+        status: task.status
+      });
+      if (task.status === "Completed" || task.status === "Expired") {
+        alert(`This task is ${task.status}, so you can't use the timer`);
+      } else {
+          setTimerOpenModal(true);
+      }
     }
   };
 
