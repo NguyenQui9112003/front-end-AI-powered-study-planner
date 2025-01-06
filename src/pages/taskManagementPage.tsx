@@ -1,21 +1,27 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import dayjs from 'dayjs';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Task } from '@/types/taskType.tsx';
 import { getTokenData } from '@/helpers/utility/tokenData.ts';
+
+import { Modal } from '../components/common/modal.tsx';
 import { Dropdown } from '../components/common/dropdown.tsx';
 
 import Header from '../layouts/header.tsx';
 
+// import { TimerForm } from '@/components/features/task-management/TimerForm.tsx';
+import { CreateTaskForm } from '../components/features/task-management/CreateTaskForm.tsx';
+import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
+
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
+import { useNavigate } from 'react-router-dom';
+import { AuthError, authFetch } from '@/helpers/utility/authFetch.ts';
 
 export const TaskManagementPage = () => {
 	const user = getTokenData().username;
-
 	const navigate = useNavigate();
 
 	const [dataFetch, setDataFetch] = useState<Task[]>([]);
@@ -23,10 +29,11 @@ export const TaskManagementPage = () => {
 
 	const [openCreateTaskModal, setCreateTaskOpenModal] = useState(false);
 	const [openUpdateTaskModal, setUpdateTaskOpenModal] = useState(false);
-	const [openTimerModal, setTimerOpenModal] = useState(false);
+	// const [openTimerModal, setTimerOpenModal] = useState(false);
+	const formRef = useRef<{ submitForm: () => void } | null>(null);
 
-	const [sortOption, setSortOption] = useState<string | null>('Sort');
-	const [filterOption, setFilterOption] = useState<string | null>('Filter');
+	const [sortOption, setSortOption] = useState<string | null>("Sort");
+	const [filterOption, setFilterOption] = useState<string | null>("Filter");
 	const [processedData, setProcessedData] = useState<Task[]>([]);
 
 	const [searchInput, setSearchInput] = useState('');
@@ -47,18 +54,19 @@ export const TaskManagementPage = () => {
 			setCreateTaskOpenModal(false);
 		} else if (openUpdateTaskModal == true) {
 			setUpdateTaskOpenModal(false);
-		} else if (openTimerModal == true) {
-			setTimerOpenModal(false);
 		}
+		// } else if (openTimerModal == true) {
+		// 	setTimerOpenModal(false);
+		// }
 		fetchTasks();
 	};
 
 	// create task modal
-	const handleCreateTask = (task: Task) => {
-		setDataFetch([...dataFetch, task]);
-		return () => {
-			setDataFetch(dataFetch);
-		};
+	const handleCreateTask = () => {
+		if (formRef.current) {
+			formRef.current.submitForm();
+			fetchTasks();
+		}
 	};
 
 	// update task modal
@@ -67,23 +75,40 @@ export const TaskManagementPage = () => {
 		setUpdateTaskOpenModal(true);
 	};
 
-	// focus timer modal
-	const handleTimerModal = (task: any) => {
-		setCurrentTask(task);
-		setTimerOpenModal(true);
+	const handleUpdateTask = () => {
+		if (formRef.current) {
+			formRef.current.submitForm();
+			fetchTasks();
+		}
 	};
+
+	// focus timer modal
+	// const handleTimerModal = (task: any) => {
+	// 	setCurrentTask(task);
+	// 	setTimerOpenModal(true);
+	// };
+
+	// const handleSession = () => {
+	// 	if (formRef.current) {
+	// 		formRef.current.submitForm();
+	// 		fetchTasks();
+	// 	}
+	// 	setTimerOpenModal(false);
+	// };
 
 	// render task table
 	const handleSave = (updatedTask: any) => {
-		if (currentTask) updateTask(updatedTask, currentTask._id); // Cập nhật bảng
+		if (currentTask) updateTask(currentTask._id, updatedTask); // Cập nhật bảng
 		setUpdateTaskOpenModal(false); // Đóng modal
 	};
 
 	const updateTask = (id: any, updatedTask: any) => {
-		setDataFetch(
-			dataFetch.map((task) => (task._id === id ? updatedTask : task))
-		);
+		setDataFetch(dataFetch.map((task) => (task._id === id ? updatedTask : task)));
 	};
+
+	useEffect(() => {
+		fetchTasks();
+	}, []);
 
 	const fetchTasks = async () => {
 		try {
@@ -105,11 +130,10 @@ export const TaskManagementPage = () => {
 
 			const data = await response.json();
 			setDataFetch(data);
-			applyFilterSortSearch(data);
+			setProcessedData(data);
 		} catch (error) {
 			if (error instanceof AuthError) {
-				console.error(error);
-				navigate('/signIn');
+				navigate("/signIn");
 			}
 			console.error('Error fetching profile:', error);
 		}
@@ -117,15 +141,12 @@ export const TaskManagementPage = () => {
 
 	const deleteTask = async (taskName: string) => {
 		try {
-			const response = await fetch('http://localhost:3000/tasks/delete', {
+			const response = await authFetch('http://localhost:3000/tasks/delete', {
 				method: 'POST',
 				headers: {
 					'Content-type': 'application/json',
 				},
-				body: JSON.stringify({
-					username: user,
-					taskName,
-				}),
+				body: JSON.stringify({ username: user, taskName }),
 			});
 
 			if (!response.ok) {
@@ -134,9 +155,13 @@ export const TaskManagementPage = () => {
 			} else {
 				fetchTasks();
 			}
+
 		} catch (error) {
-			console.error('Server: Failed request.');
-			if (error instanceof Error) {
+			console.error("Server: Failed request.");
+			if (error instanceof AuthError) {
+				navigate("/signIn");
+			}
+			else if (error instanceof Error) {
 				toast.error(error.message, {
 					position: 'top-right',
 				});
@@ -146,20 +171,17 @@ export const TaskManagementPage = () => {
 				});
 			}
 		}
-	};
+	}
 
-	const applyFilterSortSearch = (data: Task[]) => {
-		let baseData = [...data];
+	const applyFilterSortSearch = () => {
+		let baseData = [...dataFetch]; 
 		// filter
 		if (filterOption !== 'Filter: Default') {
 			baseData = baseData.filter((item) => {
-				const filterList = ['Completed', 'Todo', 'In Progress', 'Expired']
-				
-				for (const filter of filterList) {
-					if (filterOption === filter)
-						return item.status === filter;
-				}
-
+				if (filterOption === 'Completed') return item.status === 'Completed';
+				if (filterOption === 'Todo') return item.status === 'Todo';
+				if (filterOption === 'In Progress') return item.status === 'In Progress';
+				if (filterOption === 'Expired') return item.status === 'Expired';
 				return true;
 			});
 		}
@@ -172,13 +194,11 @@ export const TaskManagementPage = () => {
 		};
 		if (sortOption === 'Ascending') {
 			baseData.sort(
-				(a, b) =>
-					priorityMap[a.priorityLevel] - priorityMap[b.priorityLevel]
+				(a, b) => priorityMap[a.priorityLevel] - priorityMap[b.priorityLevel]
 			);
 		} else if (sortOption === 'Descending') {
 			baseData.sort(
-				(a, b) =>
-					priorityMap[b.priorityLevel] - priorityMap[a.priorityLevel]
+				(a, b) => priorityMap[b.priorityLevel] - priorityMap[a.priorityLevel]
 			);
 		}
 
@@ -186,25 +206,22 @@ export const TaskManagementPage = () => {
 		if (searchInput.trim() !== '') {
 			baseData = baseData.filter((item) =>
 				Object.values(item).some((value) =>
-					value
-						.toString()
-						.toLowerCase()
-						.includes(searchInput.toLowerCase())
+					value.toString().toLowerCase().includes(searchInput.toLowerCase())
 				)
 			);
 		}
 		setProcessedData(baseData);
 	};
 
-	const handleSearchInputChange = (event: any) => {};
-
-	const handleSearchSubmit = async (event: any) => {
-		applyFilterSortSearch(dataFetch);
-	};
-
 	useEffect(() => {
-		fetchTasks();
-	}, []);
+		applyFilterSortSearch();
+	}, [filterOption, sortOption, searchInput]);
+
+
+	const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		applyFilterSortSearch(); 
+	};
 
 	return (
 		<div className="">
@@ -214,17 +231,14 @@ export const TaskManagementPage = () => {
 				<div className="flex flex-Task">
 					<button
 						onClick={() =>
-							setCreateTaskOpenModal(!openCreateTaskModal)
-						}
-						className="bg-green-500 text-white py-2 font-medium rounded-md sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm min-w-[120px]"
-					>
+							setCreateTaskOpenModal(!openCreateTaskModal)}
+						className="bg-green-500 text-white py-2 font-medium rounded-md sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm min-w-[120px]">
 						+ Add New Task
 					</button>
 
 					<form
 						onSubmit={handleSearchSubmit}
-						className="flex items-center"
-					>
+						className="flex items-center">
 						<input
 							id="search-input"
 							name="Search Bar"
@@ -233,41 +247,18 @@ export const TaskManagementPage = () => {
 							placeholder="Search task"
 							type="search"
 							value={searchInput}
-							onChange={handleSearchInputChange}
-						/>
-
-						<button
-							type="submit"
-							className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-						>
-							Search
-						</button>
+							onChange={(e) => setSearchInput(e.target.value)} />
 					</form>
 
 					<Dropdown
 						options={['Default', 'Ascending', 'Descending']}
 						onSelect={(option) => setSortOption(option)}
-						value={sortOption}
-					/>
+						value={sortOption} />
 
 					<Dropdown
-						options={[
-							'Filter: Default',
-							'Completed',
-							'In Progress',
-							'Todo',
-						]}
+						options={['Default', 'Todo', 'In Progress', 'Completed', 'Expired']}
 						onSelect={(option) => setFilterOption(option)}
-						placeholder="Filter"
-						value={filterOption}
-					/>
-
-					<button
-						onClick={() => applyFilterSortSearch(dataFetch)}
-						className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-					>
-						Sort & Filter
-					</button>
+						value={filterOption} />
 				</div>
 			</div>
 
@@ -289,13 +280,13 @@ export const TaskManagementPage = () => {
 						<th className="border border-gray-200 px-2 py-2 w-[96px]">
 							Status
 						</th>
-						<th className="border border-gray-200 px-2 py-2 w-[192px]">
+						<th className="border border-gray-200 px-2 py-2 w-[200px]">
 							Action
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					{processedData.map((task) => (
+					{(processedData.length > 0 ? processedData : dataFetch).map((task) => (
 						<tr key={task._id} className="hover:bg-gray-50">
 							<td className="border border-gray-200 px-4 py-2">
 								{task.taskName}
@@ -307,14 +298,10 @@ export const TaskManagementPage = () => {
 								{task.priorityLevel}
 							</td>
 							<td className="border border-gray-200 px-4 py-2">
-								<div className="flex flex-row justify-center">
-									{dayjs(task.startDate).format(
-										'HH:mm:ss DD/MM/YYYY'
-									)}{' '}
-									-{' '}
-									{dayjs(task.endDate).format(
-										'HH:mm:ss DD/MM/YYYY'
-									)}
+								<div className='flex flex-row justify-center'>
+									{dayjs(task.startDate).format('HH:mm:ss DD/MM/YYYY')}
+									{' '}-{' '}
+									{dayjs(task.endDate).format('HH:mm:ss DD/MM/YYYY')}
 								</div>
 							</td>
 							<td className="border border-gray-200 px-4 py-2">
@@ -324,24 +311,21 @@ export const TaskManagementPage = () => {
 							<td className="border border-gray-200 px-4 py-2">
 								<button
 									onClick={() => handleUpdateTaskModal(task)}
-									className="bg-blue-500 text-white px-2 py-1 rounded-md w-[70px]"
-								>
+									className="bg-blue-500 text-white px-2 py-1 rounded-md w-[70px]">
 									Update
 								</button>
 
 								<button
 									onClick={() => deleteTask(task.taskName)}
-									className="bg-red-500 text-white px-2 py-1 rounded-md ml-2 w-[70px]"
-								>
+									className="bg-red-500 text-white px-2 py-1 rounded-md ml-2 w-[70px]">
 									Delete
 								</button>
 
-								<button
+								{/* <button
 									onClick={() => handleTimerModal(task)}
-									className="bg-green-500 text-white px-2 py-1 rounded-md ml-2 w-[70px]"
-								>
+									className="bg-green-500 text-white px-2 py-1 rounded-md ml-2 w-[70px]">
 									Timer
-								</button>
+								</button> */}
 							</td>
 						</tr>
 					))}
@@ -357,7 +341,7 @@ export const TaskManagementPage = () => {
 				<Modal.Body>
 					<CreateTaskForm
 						ref={formRef}
-						user={decodedToken.email}
+						user={user}
 					></CreateTaskForm>
 				</Modal.Body>
 				<Modal.Footer>
@@ -367,7 +351,7 @@ export const TaskManagementPage = () => {
 						</Modal.DismissButton>
 						<button
 							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
-							onClick={handleConfirm}
+							onClick={handleCreateTask}
 						>
 							Confirm
 						</button>
@@ -377,79 +361,35 @@ export const TaskManagementPage = () => {
 
 			<Modal isOpen={openUpdateTaskModal} onClose={handleCloseModal}>
 				<Modal.Header>
-					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">
-						Update Your Task
-					</div>
+					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">Update Your Task</div>
 				</Modal.Header>
 				<Modal.Body>
-					<UpdateTaskForm
-						ref={formRef}
-						defaultValues={defaultValues}
-						onSave={handleSave}
-					></UpdateTaskForm>
+					<UpdateTaskForm ref={formRef} defaultValues={defaultValues} onSave={handleSave} user={user}></UpdateTaskForm>
 				</Modal.Body>
 				<Modal.Footer>
-					<div className="flex justify-end">
-						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
-							Close
-						</Modal.DismissButton>
-						<button
-							className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
-							onClick={handleConfirm}
-						>
-							Save Changes
-						</button>
+					<div className='flex justify-end'>
+						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">Close</Modal.DismissButton>
+						<button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1" onClick={handleUpdateTask}>Save Changes</button>
 					</div>
 				</Modal.Footer>
 			</Modal>
 
 			<AISuggestion tasks={processedData} />
 
-			{/* Add new Task */}
-
-			{/* <div className="mt-4 flex space-x-2">
-                <input
-                    type="text"
-                    placeholder="Task Name"
-                    value={newTask.taskName}
-                    onChange={(e) => setNewTask({ ...newTask, taskName: e.target.value })}
-                    className="border border-gray-300 rounded-md px-4 py-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Description"
-                    value={newTask.description}
-                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                    className="border border-gray-300 rounded-md px-4 py-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Priority Level"
-                    value={newTask.priorityLevel}
-                    onChange={(e) => setNewTask({ ...newTask, priorityLevel: e.target.value })}
-                    className="border border-gray-300 rounded-md px-4 py-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Estimated Time"
-                    value={newTask.estimatedTime}
-                    onChange={(e) => setNewTask({ ...newTask, estimatedTime: e.target.value })}
-                    className="border border-gray-300 rounded-md px-4 py-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Status"
-                    value={newTask.status}
-                    onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
-                    className="border border-gray-300 rounded-md px-4 py-2"
-                />
-                <button
-                    onClick={addTask}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
-                >
-                    Add
-                </button>
-            </div> */}
-		</div>
+			{/* <Modal isOpen={openTimerModal} onClose={handleCloseModal}>
+				<Modal.Header>
+					<div className="text-blue-500 font-bold text-2xl mb-3 text-center">Timer&nbsp;&nbsp;&nbsp;</div>
+				</Modal.Header>
+				<Modal.Body>
+					<TimerForm ref={formRef} defaultValues={defaultValues} user={user}></TimerForm>
+				</Modal.Body>
+				<Modal.Footer>
+					<div className='flex justify-end mt-3'>
+						<Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">Close</Modal.DismissButton>
+						<button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1" onClick={handleSession}>End</button>
+					</div>
+				</Modal.Footer>
+			</Modal> */}
+		</div >
 	);
-};
+}

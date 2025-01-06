@@ -1,3 +1,5 @@
+import { NavigateFunction } from 'react-router-dom';
+
 const refreshToken = async (refresh_token: string) => {
 	if (!refresh_token) {
 		return null;
@@ -35,14 +37,23 @@ export class AuthError extends Error {
 	}
 }
 
-export const authFetch = async (url: string, request: RequestInit) => {
+export const authFetch = async (
+	url: string,
+	request: RequestInit,
+	navigate?: NavigateFunction
+) => {
 	const token = window.localStorage.getItem('token');
 
+	const toLogin = () => {
+		if (navigate) navigate('/signIn');
+	};
+
 	if (!token) {
+		toLogin();
 		throw new AuthError('No token found');
 	}
 
-	const parsedToken = JSON.parse(token);
+	const parsedToken = token ? JSON.parse(token) : null;
 	let accessToken = parsedToken.access_token;
 	const refresh_token = parsedToken.refresh_token;
 
@@ -51,28 +62,35 @@ export const authFetch = async (url: string, request: RequestInit) => {
 		Authorization: `Bearer ${accessToken}`,
 	};
 
-	let response = await fetch(url, request);
+	try {
+		let response = await fetch(url, request);
 
-	if (!response.ok && response.status === 419) {
-		accessToken = await refreshToken(refresh_token);
+		if (!response.ok && response.status === 419) {
+			accessToken = await refreshToken(refresh_token);
 
-		if (!accessToken) {
-			throw new AuthError('No access token found');
-		}
+			if (!accessToken) {
+				toLogin();
+				throw new AuthError('Refresh token invalid');
+			}
 
-		request.headers = {
-			...request.headers,
-			Authorization: `Bearer ${accessToken}`,
-		};
+			request.headers = {
+				...request.headers,
+				Authorization: `Bearer ${accessToken}`,
+			};
 
-		response = await fetch(url, request);
+			response = await fetch(url, request);
 
-		if (!response.ok) {
-			throw new AuthError('Request failed');
+			if (!response.ok) {
+				toLogin();
+				throw new AuthError('Request fail: ' + response);
+			}
+
+			return response;
 		}
 
 		return response;
+	} catch (error) {
+		console.error('Error fetching:', error);
+		throw new AuthError('Unknown error: ' + error);
 	}
-
-	return response;
 };

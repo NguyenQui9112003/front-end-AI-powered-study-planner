@@ -6,11 +6,16 @@ import { useForm, SubmitHandler } from "react-hook-form"
 
 import { useGoogleLogin } from "./LoginGoogleForm";
 import { useAuth } from "../../../helpers/context/authProvider";
-
+import { useState } from "react";
+import ForgotPasswordModal from "../profile/ForgotPasswordModal";
 export const LoginForm = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
     const logInGoogle = useGoogleLogin();
+    const [showModal, setShowModal] = useState(false);
+
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     const navigateToRegister = () => {
         navigate(`/register`)
@@ -101,23 +106,41 @@ export const LoginForm = () => {
                             </div>}
                     </div>
 
-                    <div className="flex items-center justify-between mt-3">
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            type="submit">
-                            Sign In
-                        </button>
-                        <a className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-7"
-                            style={{ cursor: 'pointer' }}
-                            type='submit'
-                            onClick={navigateToRegister}>
-                            Register account?
-                        </a>
+                    <div className="mt-3">
+                        <div className="flex items-center justify-between">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="submit"
+                            >
+                                Sign In
+                            </button>
+                            <a
+                                className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-7"
+                                style={{ cursor: 'pointer' }}
+                                onClick={navigateToRegister}
+                            >
+                                Register account?
+                            </a>
+                        </div>
+                        <div className="mt-2 text-center">
+                            <a
+                                className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-7"
+                                type="button"
+                                onClick={handleShowModal}
+                            >
+                                Forgot password?
+                            </a>
+                        </div>
                     </div>
                 </form>
 
                 <button className="w-full mb-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleLogInGooglge}>
                     Google Login
                 </button>
+                <ForgotPasswordModal
+                    show={showModal}
+                    onHide={handleCloseModal}
+                />
             </div>
         </>
     )

@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Modal, Button, Form } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../../css/profile.css";
 import bcrypt from 'bcryptjs';
+import { useAuth } from '../../../helpers/context/authProvider';
 
-const EmailVerificationModal = ({ show, onHide }) => {
-    const [step, setStep] = useState(1); // Step 1: Email input, Step 2: OTP input
-    const [email, setEmail] = useState('');
+const EmailVerificationModal = ({ show, onHide, email }: any) => {
+    const navigate = useNavigate();
     const [otp, setOtp] = useState({from_mail: "", entered: ""});
     const [error, setError] = useState("");
+    const { logout } = useAuth();
 
-    const handleEmailSubmit = async () => {
-        if (!email) {
-            setError("Email is required!");
-            return;
-        }
+    const sendOTPWithMail = async () => {
+        console.log("send otppppppppp");
         try {
             const response = await fetch("http://localhost:3000/auth/sendOTP", {
                 method: "POST",
@@ -30,7 +29,7 @@ const EmailVerificationModal = ({ show, onHide }) => {
                     ...prevState,
                     from_mail: data.otp,
                 }));
-                setStep(2);
+                
                 setError("");
             } else {
                 const errorData = await response.json();
@@ -63,6 +62,10 @@ const EmailVerificationModal = ({ show, onHide }) => {
                 });
                 if (response.ok) {
                     alert("Account verified");
+                    // onAccountVerified();
+                    onHide();
+                    logout();
+                    navigate(`/signIn`);
                 } else {
                     const errorData = await response.json();
                     alert(`Error: ${errorData.message || "Can't send OTP"}`);
@@ -79,49 +82,31 @@ const EmailVerificationModal = ({ show, onHide }) => {
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} onShow={sendOTPWithMail}>
             <Modal.Header closeButton={true}> 
-                <Modal.Title>{step === 1 ? 'Enter Your Email' : 'Enter OTP'}</Modal.Title>
+                <Modal.Title>Account verification</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {step === 1 ? (
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Enter your email address</Form.Label>
-                            <Form.Control
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </Form.Group>
-                        {error && <div className="text-danger">{error}</div>}
-                        <Col className="d-flex justify-content-end">
-                            <Button variant="primary" onClick={handleEmailSubmit}>
-                                Submit
-                            </Button>
-                        </Col>
-                    </Form>
-                ) : (
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Enter the OTP sent to your email</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="OTP"
-                                value={otp.entered}
-                                onChange={(e) => setOtp((prevState) => ({
-                                    ...prevState, 
-                                    entered: e.target.value,
-                                }))}
-                            />
-                        </Form.Group>
-                        {error && <div className="text-danger">{error}</div>}
+                <Form>
+                    <Form.Group className="mb-3">
+                        <Form.Label>OTP sent to {email}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter your OTP"
+                            value={otp.entered}
+                            onChange={(e) => setOtp((prevState) => ({
+                                ...prevState, 
+                                entered: e.target.value,
+                            }))}
+                        />
+                    </Form.Group>
+                    {error && <div className="text-danger">{error}</div>}
+                    <Col className="d-flex justify-content-end">
                         <Button variant="primary" onClick={handleOtpSubmit}>
                             Submit OTP
                         </Button>
-                    </Form>
-                )}
+                    </Col>
+                </Form>
             </Modal.Body>
         </Modal>
     );
