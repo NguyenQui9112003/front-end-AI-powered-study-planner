@@ -1,7 +1,9 @@
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useRefreshToken } from "../../../helpers/utility/refreshToken";
 
 import { Task } from '@/types/taskType';
 import { adjustToUTC7 } from '@/helpers/utility/timezone';
@@ -26,6 +28,9 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 			status: string;
 		};
 
+		const navigate = useNavigate();
+		const getRefreshToken = useRefreshToken();
+
 		const {
 			register,
 			handleSubmit,
@@ -48,25 +53,59 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 
 		const onSubmit: SubmitHandler<Inputs> = async (data) => {
 			data.username = user;
+			const token = window.localStorage.getItem("token");
+			if (!token) {
+				navigate("/signIn");
+				return;
+			}
+			const parsedToken = JSON.parse(token);
+			let accessToken = parsedToken.access_token;
+			const refreshToken = parsedToken.refresh_token;
+
 			try {
-				const response = await fetch('http://localhost:3000/tasks/update',
+				let response = await fetch('http://localhost:3000/tasks/update',
 					{
 						method: 'POST',
 						headers: {
+							Authorization: `Bearer ${accessToken}`,
 							'Content-type': 'application/json',
 						},
 						body: JSON.stringify(data),
 					}
 				);
 
-				if (!response.ok) {
-					const errorData = await response.json();
-					throw new Error(errorData.message || 'Server error');
-				} else {
+				if (response.ok) {
 					toast.success('Task updated successfully', {
 						position: 'top-right',
 					});
+				} else if (response.status === 419) {
+					accessToken = await getRefreshToken(refreshToken);
+					response = await fetch('http://localhost:3000/tasks/update',
+						{
+							method: 'POST',
+							headers: {
+								Authorization: `Bearer ${accessToken}`,
+								'Content-type': 'application/json',
+							},
+							body: JSON.stringify(data),
+						}
+					);
+
+					if (response.ok) {
+						toast.success('Task updated successfully', {
+							position: 'top-right',
+						});
+					} else {
+						navigate("/signIn");
+						alert("Session auth expired");
+					}
 				}
+
+				if (!response.ok) {
+					const errorData = await response.json();
+					throw new Error(errorData.message || 'Server error');
+				} 
+				
 			} catch (error) {
 				if (error instanceof Error) {
 					toast.error(error.message, {

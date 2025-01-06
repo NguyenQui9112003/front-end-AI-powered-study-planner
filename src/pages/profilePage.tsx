@@ -17,6 +17,7 @@ export const ProfilePage = () => {
     hasPassword: true,
   });
   const [showModal, setShowModal] = useState(false);
+
 // GET PROFILE INFORMATION
   useEffect(() => {
     const fetchProfile = async () => {
@@ -65,6 +66,7 @@ export const ProfilePage = () => {
               });
             } else {
               navigate("/signIn");
+              alert("Session auth expired");
             }
           }
         } else {

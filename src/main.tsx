@@ -14,12 +14,13 @@ import { RegisterForm } from './components/features/auth/RegisterForm';
 import { ProfilePage } from './pages/profilePage';
 import { TaskManagementPage } from './pages/taskManagementPage';
 import { AnalyzePage } from './pages/analyzePage';
+import { GuestPage } from './pages/guestPage';
 
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <Navigate to="/signIn" replace />,
+      element: <Navigate to="/guest" replace />,
       errorElement: <Error />,
     },
     {
@@ -30,6 +31,11 @@ const router = createBrowserRouter(
     {
       path: "/register",
       element: <RegisterForm />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/guest",
+      element: <GuestPage />,
       errorElement: <Error />,
     },
     {
@@ -49,7 +55,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/profile",
-      element: <ProfilePage />,
+      element: <PrivateRoute element={<ProfilePage />} />,
       errorElement: <Error />,
     },
   ],

@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import dayjs from 'dayjs';
 import { useRef, useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import dayjs from 'dayjs';
+import { useNavigate } from "react-router-dom";
+
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Task } from '@/types/taskType.tsx';
 import { getTokenData } from '@/helpers/utility/tokenData.ts';
+import { useRefreshToken } from "../helpers/utility/refreshToken";
 
 import { Modal } from '../components/common/modal.tsx';
 import { Dropdown } from '../components/common/dropdown.tsx';
@@ -16,10 +19,11 @@ import Header from '../layouts/header.tsx';
 // import { TimerForm } from '@/components/features/task-management/TimerForm.tsx';
 import { CreateTaskForm } from '../components/features/task-management/CreateTaskForm.tsx';
 import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
-
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
 
 export const TaskManagementPage = () => {
+	const navigate = useNavigate();
+	const getRefreshToken = useRefreshToken();
 	const user = getTokenData().username;
 
 	const [dataFetch, setDataFetch] = useState<Task[]>([]);
@@ -109,46 +113,108 @@ export const TaskManagementPage = () => {
 	}, []);
 
 	const fetchTasks = async () => {
+		const token = window.localStorage.getItem("token");
+		if (!token) {
+			navigate("/signIn");
+			return;
+		}
+		const parsedToken = JSON.parse(token);
+		let accessToken = parsedToken.access_token;
+		const refreshToken = parsedToken.refresh_token;
+
 		try {
-			const response = await fetch(
-				`http://localhost:3000/tasks?userName=${encodeURIComponent(
+			let response = await fetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 				{
 					method: 'GET',
 					headers: {
+						Authorization: `Bearer ${accessToken}`,
 						'Content-type': 'application/json',
 					},
 				}
 			);
 
+			if (response.ok) {
+				const data = await response.json();
+				setDataFetch(data);
+				setProcessedData(data);
+			} else if (response.status === 419) {
+				accessToken = await getRefreshToken(refreshToken);
+				response = await fetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
+					user
+				)}`,
+					{
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${accessToken}`,
+							'Content-type': 'application/json',
+						},
+					}
+				);
+
+				if (response.ok) {
+					const data = await response.json();
+					setDataFetch(data);
+					setProcessedData(data);
+				} else {
+					navigate("/signIn");
+					alert("Session auth expired");
+				}
+			}
+
 			if (!response.ok) {
 				throw new Error(`Error: ${response.statusText}`);
 			}
-
-			const data = await response.json();
-			setDataFetch(data);
-			setProcessedData(data);
 		} catch (error) {
 			console.error('Error fetching profile:', error);
 		}
 	};
 
 	const deleteTask = async (taskName: string) => {
+		const token = window.localStorage.getItem("token");
+		if (!token) {
+			navigate("/signIn");
+			return;
+		}
+		const parsedToken = JSON.parse(token);
+		let accessToken = parsedToken.access_token;
+		const refreshToken = parsedToken.refresh_token;
+
 		try {
-			const response = await fetch('http://localhost:3000/tasks/delete', {
+			let response = await fetch('http://localhost:3000/tasks/delete', {
 				method: 'POST',
 				headers: {
+					Authorization: `Bearer ${accessToken}`,
 					'Content-type': 'application/json',
 				},
 				body: JSON.stringify({ username: user, taskName }),
 			});
 
+			if (response.ok) {
+				fetchTasks();
+			} else if (response.status === 419) {
+				accessToken = await getRefreshToken(refreshToken);
+				response = await fetch('http://localhost:3000/tasks/delete', {
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+						'Content-type': 'application/json',
+					},
+					body: JSON.stringify({ username: user, taskName }),
+				});
+
+				if (response.ok) {
+					fetchTasks();
+				} else {
+					navigate("/signIn");
+					alert("Session auth expired");
+				}
+			}
+
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.message || 'Server error');
-			} else {
-				fetchTasks();
 			}
 
 		} catch (error) {
