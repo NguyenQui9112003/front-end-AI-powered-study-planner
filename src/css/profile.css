@@ -1,6 +1,6 @@
 body {
     background: #f7f7ff;
-    margin-top:20px;
+    /* margin-top:20px; */
 }
 .card {
     position: relative;
@@ -23,15 +23,15 @@ body {
     overflow-wrap: break-word; 
   }
 
-  .btn-close {
+  /* .btn-close {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .btn-close::before {
-    content: "X"; /* Replace with your desired symbol */
+    content: "X"; 
     font-size: 1rem;
     font-weight: bold;
-    color: rgb(0, 0, 0); /* Change to your preferred color */
-}
+    color: rgb(0, 0, 0); /
+} */

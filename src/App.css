@@ -1,6 +1,9 @@
 #root {
   max-width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
+  /* margin: 0 auto; */
+  /* padding: 2rem; */
   text-align: center;
+}
+.bg-blue-600 {
+  background-color: #1e3a8a !important;
 }

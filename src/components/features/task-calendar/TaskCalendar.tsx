@@ -161,27 +161,32 @@ const TaskCalendar: React.FC = () => {
   };
 
   return (
-    <div className="calendar-container">
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin, listPlugin, timeGridPlugin]}
-        initialView="dayGridMonth"
-        editable={true}
-        droppable={true}
-        events={tasks}
-        eventContent={renderTaskContent}
-        eventChange={changeTaskByDragging}
-        eventClick={handleTimer}
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        footerToolbar={{
-          left: "",
-          center: "",
-          right: "prevYear,nextYear",
-        }}
-      />
+    <div className="calendar-container p-4 min-h-screen">
+      <div className="bg-white shadow-md rounded-lg p-4">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin, listPlugin, timeGridPlugin]}
+          initialView="dayGridMonth"
+          editable={true}
+          droppable={true}
+          events={tasks}
+          eventContent={renderTaskContent}
+          eventChange={changeTaskByDragging}
+          eventClick={handleTimer}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          footerToolbar={{
+            left: "",
+            center: "",
+            right: "prevYear,nextYear",
+          }}
+          height="auto"
+          contentHeight="auto"
+          className="custom-calendar"
+        />
+      </div>
 
       <Modal isOpen={openTimerModal} onClose={handleCloseModal}>
         <Modal.Header>

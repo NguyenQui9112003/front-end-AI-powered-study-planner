@@ -65,7 +65,7 @@ export const RegisterForm = () => {
     return (
         <>
             <ToastContainer />
-            <div className="w-full max-w-xs mx-auto">
+            <div className="m-4 w-full max-w-xs mx-auto">
                 <div className="text-blue-500 font-bold text-3xl mb-3 text-center">Sign-up</div>
                 <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-1">

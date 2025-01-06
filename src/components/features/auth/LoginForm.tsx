@@ -74,7 +74,7 @@ export const LoginForm = () => {
     return (
         <>
             <ToastContainer />
-            <div className="w-full max-w-xs mx-auto">
+            <div className="m-4 w-full max-w-xs mx-auto">
                 <div className="text-blue-500 font-bold text-3xl mb-3 text-center">Log In</div>
                 <form action="/user/auth" className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-1">
@@ -82,6 +82,7 @@ export const LoginForm = () => {
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="username"
                             type="text"
+                            placeholder="Username"
                             {...register("username", { required: "This field is required" })} />
                         {errors.username &&
                             <div className='text-xs text-left mt-1 text-red-700'>
@@ -94,6 +95,7 @@ export const LoginForm = () => {
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="password"
                             type="password"
+                            placeholder="Password"
                             {...register("password", { required: "This field is required",
                             maxLength: {
                                 value: 20,
@@ -109,13 +111,13 @@ export const LoginForm = () => {
                     <div className="mt-3">
                         <div className="flex items-center justify-between">
                             <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
                                 type="submit"
                             >
                                 Sign In
                             </button>
                             <a
-                                className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-7"
+                                className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-auto"
                                 style={{ cursor: 'pointer' }}
                                 onClick={navigateToRegister}
                             >
