@@ -1,41 +1,33 @@
 import { NavigateFunction } from 'react-router-dom';
 
-const refreshToken = async (refresh_token: string) => {
-	if (!refresh_token) {
-		return null;
-	}
-
-	try {
-		const response = await fetch(
-			'http://localhost:3000/auth/refresh-token',
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ refresh_token }),
-			}
-		);
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const data = await response.json();
-		window.localStorage.setItem('token', JSON.stringify(data));
-		return data.access_token;
-	} catch (error) {
-		console.error('Error refreshing token:', error);
-		return null;
-	}
-};
-
 export class AuthError extends Error {
 	constructor(message: string) {
 		super(message);
 		this.name = 'AuthError';
 	}
 }
+
+const refreshToken = async (refresh_token: string) => {
+	if (!refresh_token) {
+		throw new AuthError('Refresh token not found');
+	}
+
+	const response = await fetch('http://localhost:3000/auth/refresh-token', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ refresh_token }),
+	});
+
+	if (!response.ok) {
+		throw new AuthError('Refresh token invalid');
+	}
+
+	const data = await response.json();
+	window.localStorage.setItem('token', JSON.stringify(data));
+	return data.access_token;
+};
 
 export const authFetch = async (
 	url: string,
@@ -49,7 +41,6 @@ export const authFetch = async (
 	};
 
 	if (!token) {
-		toLogin();
 		throw new AuthError('No token found');
 	}
 
@@ -69,7 +60,6 @@ export const authFetch = async (
 			accessToken = await refreshToken(refresh_token);
 
 			if (!accessToken) {
-				toLogin();
 				throw new AuthError('Refresh token invalid');
 			}
 
@@ -89,7 +79,12 @@ export const authFetch = async (
 
 		return response;
 	} catch (error) {
+		if (error instanceof AuthError) {
+			toLogin()
+			throw error;
+		}
+
 		console.error('Error fetching:', error);
-		throw new AuthError('Unknown error: ' + error);
+		throw error;
 	}
 };

@@ -19,11 +19,10 @@ import { CreateTaskForm } from '../components/features/task-management/CreateTas
 import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
 
-import { AuthError, authFetch } from '@/helpers/utility/authFetch.ts';
+import { authFetch } from '@/helpers/utility/authFetch.ts';
 
 export const TaskManagementPage = () => {
 	const navigate = useNavigate();
-	const getRefreshToken = useRefreshToken();
 	const user = getTokenData().username;
 
 	const [dataFetch, setDataFetch] = useState<Task[]>([]);
@@ -113,23 +112,13 @@ export const TaskManagementPage = () => {
 	}, []);
 
 	const fetchTasks = async () => {
-		const token = window.localStorage.getItem("token");
-		if (!token) {
-			navigate("/signIn");
-			return;
-		}
-		const parsedToken = JSON.parse(token);
-		let accessToken = parsedToken.access_token;
-		const refreshToken = parsedToken.refresh_token;
-
 		try {
-			let response = await authFetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
+			const response = await authFetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 				{
 					method: 'GET',
 					headers: {
-						Authorization: `Bearer ${accessToken}`,
 						'Content-type': 'application/json',
 					},
 				}, navigate
@@ -138,7 +127,7 @@ export const TaskManagementPage = () => {
 
 				const data = await response.json();
 				setDataFetch(data);
-				applyFilterSortSearch(data);
+				applyFilterSortSearch();
 			
 		} catch (error) {
 			console.error('Error fetching profile:', error);
@@ -146,20 +135,10 @@ export const TaskManagementPage = () => {
 	};
 
 	const deleteTask = async (taskName: string) => {
-		const token = window.localStorage.getItem("token");
-		if (!token) {
-			navigate("/signIn");
-			return;
-		}
-		const parsedToken = JSON.parse(token);
-		let accessToken = parsedToken.access_token;
-		const refreshToken = parsedToken.refresh_token;
-
 		try {
 			const response = await authFetch('http://localhost:3000/tasks/delete', {
 				method: 'POST',
 				headers: {
-					Authorization: `Bearer ${accessToken}`,
 					'Content-type': 'application/json',
 				},
 				body: JSON.stringify({ username: user, taskName }),

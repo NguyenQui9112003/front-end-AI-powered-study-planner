@@ -57,6 +57,9 @@ const AnalyzePage = () => {
 
 	const stats = data.stats;
 
+	stats.avgSessionDuration /= 60;
+	stats.totalTimeSpent /= 60;
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -72,11 +75,6 @@ const AnalyzePage = () => {
 
 				const newData = await response.json();
 
-				stats.avgSessionDuration /= 60;
-				stats.totalTimeSpent /= 60;
-
-				stats.avgSessionDuration.toFixed(2);
-				stats.totalTimeSpent.toFixed(2);
 				setData(newData);
 			} catch (error) {
 				if (error instanceof AuthError) {
@@ -146,19 +144,13 @@ const AnalyzePage = () => {
 								<li>
 									Total Session Time:{' '}
 									<span className="font-bold">
-										{stats.totalTimeSpent} mins
+										{stats.totalTimeSpent.toFixed(2)} mins
 									</span>
 								</li>
 								<li>
 									Avg Session Time:{' '}
 									<span className="font-bold">
-										{data.avgSessionDuration} mins
-									</span>
-								</li>
-								<li>
-									Avg Break Duration:{' '}
-									<span className="font-bold">
-										{data.avgBreakTime} mins
+										{stats.avgSessionDuration.toFixed(2)} mins
 									</span>
 								</li>
 							</ul>
@@ -180,7 +172,7 @@ const AnalyzePage = () => {
 							className="w-full"
 						/>
 						<p className="text-center whitespace-nowrap w-max pt-3">
-							{stats.taskCompletionRate} {' % Completed'}
+							{stats.taskCompletionRate.toFixed(2)} {' % Completed'}
 						</p>
 					</CardContent>
 				</Card>

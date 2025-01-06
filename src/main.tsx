@@ -17,7 +17,7 @@ import { LoginForm } from './components/features/auth/LoginForm';
 import { RegisterForm } from './components/features/auth/RegisterForm';
 import { ProfilePage } from './pages/profilePage';
 import { TaskManagementPage } from './pages/taskManagementPage';
-import { AnalyzePage } from './pages/analyzePage';
+import AnalyzePage from './pages/analyzePage';
 import { GuestPage } from './pages/guestPage';
 
 const router = createBrowserRouter(
