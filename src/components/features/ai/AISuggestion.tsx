@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from '@/types/taskType';
 import dayjs from 'dayjs';
-import { adjustToUTC7 } from '@/helpers/utility/timezone';
+import { adjustTime } from '@/helpers/utility/timezone';
 
 interface AISuggestionProps {
 	tasks: Task[];
@@ -19,15 +19,16 @@ interface AIScheduleFeedback {
 
 export const AISuggestion = (props: AISuggestionProps) => {
 	const [AIResponse, setAIResponse] = useState<string>('No suggstion yet');
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
 
 	const onClick = async () => {
 		const tasks = props.tasks.map((task) => {
 			const startDate = task.startDate
-				? dayjs(adjustToUTC7(task.startDate)).format('HH:mm DD/MM/YYYY')
+				? dayjs(adjustTime(task.startDate)).format('HH:mm DD/MM/YYYY')
 				: null;
 			const endDate = task.endDate
-				? dayjs(adjustToUTC7(task.endDate)).format('HH:mm DD/MM/YYYY')
+				? dayjs(adjustTime(task.endDate)).format('HH:mm DD/MM/YYYY')
 				: null;
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { _id, createdAt, updatedAt, ...rest } = task;
@@ -35,6 +36,7 @@ export const AISuggestion = (props: AISuggestionProps) => {
 		});
 
 		console.log(tasks);
+		setIsLoading(true);
 
 		const response = await authFetch('https://be-ai-study-planner.onrender.com/ai/schedule', {
 			method: 'POST',
@@ -57,7 +59,7 @@ export const AISuggestion = (props: AISuggestionProps) => {
 			feedbackString += index + '. ' + suggestion.suggestion + '\n\n';
 			index++;
 		}
-
+		setIsLoading(false);
 		setAIResponse(feedbackString);
 
 		// response.json().then((res) => {
@@ -72,8 +74,8 @@ export const AISuggestion = (props: AISuggestionProps) => {
 			</div>
 
 			<div className="flex w-full px-4 py-2 my-4 justify-center min-h-full border-2 border-blue-300">
-				<p className="text-sm font-medium text-left text-blue-700 whitespace-pre-line">
-					{AIResponse}
+				<p className="text-sm font-medium text-left text-black whitespace-pre-line">
+					{isLoading ? 'AI is providing feedback...' : AIResponse}
 				</p>
 			</div>
 

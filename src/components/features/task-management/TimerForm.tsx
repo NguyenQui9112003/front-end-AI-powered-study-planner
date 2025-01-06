@@ -78,7 +78,7 @@ export const TimerForm = forwardRef<any, FocusTimeProps>(
                 }
 
             } catch (error) {
-                console.error("Server: Failed request.");
+                console.error("Server: Failed request. ", error);
             }
         };
 

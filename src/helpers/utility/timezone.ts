@@ -1,6 +1,13 @@
-export const adjustToUTC7 = (date: string | Date | null) => {
+export const adjustTime = (date: string | Date | null): string | null => {
     if (!date) return null;
-    const parsedDate = typeof date === "string" ? new Date(date) : date; // Chuyển chuỗi thành Date nếu cần
-    parsedDate.setMinutes(parsedDate.getMinutes() + 420); // Thêm 420 phút = 7 giờ
-    return parsedDate;
+    const parsedDate = typeof date === "string" ? new Date(date) : new Date(date.getTime());
+    parsedDate.setMinutes(parsedDate.getMinutes());
+    const year = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const hours = String(parsedDate.getHours()).padStart(2, "0");
+    const minutes = String(parsedDate.getMinutes()).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
