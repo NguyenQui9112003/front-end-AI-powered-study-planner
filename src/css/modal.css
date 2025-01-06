@@ -45,7 +45,7 @@
 }
 
 /* Optional Close Button */
-.btn-close {
+.modal-btn-close {
     background: none;
     border: none;
     font-size: 24px;
@@ -54,6 +54,6 @@
     padding: 8px;
 }
 
-.btn-close {
+.modal-btn-close {
     color: #ff5555;
 }
