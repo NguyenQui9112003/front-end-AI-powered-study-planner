@@ -13,24 +13,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useRefreshToken } from "@/helpers/utility/refreshToken";
 
 import { Task } from "@/types/taskType";
-interface CTask {
-  _id?: number;
-  taskName: string;
-  description: string;
-  priorityLevel: string;
-  timeFocus: string;
-  start: Date | string | null;
-  end: Date | string | null;
-  status: string;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
-};
+
 const TaskCalendar: React.FC = () => {
   const user = getTokenData().username;
   const navigate = useNavigate();
   const getRefreshToken = useRefreshToken();
 
-  const [tasks, setTasks] = useState<CTask[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [openTimerModal, setTimerOpenModal] = useState(false);
 
@@ -69,11 +58,11 @@ const TaskCalendar: React.FC = () => {
 
       if (response.ok) { 
         const data = await response.json();
-        const mappedTasks = data.map((task: CTask) => ({
+        const mappedTasks = data.map((task: Task) => ({
           _id: task._id,
           taskName: task.taskName,
-          start: task.start,
-          end: task.end,
+          startDate: task.startDate,
+          endDate: task.endDate,
           timeFocus: task.timeFocus,
           status: task.status,
           description: task.description,
@@ -197,8 +186,8 @@ const TaskCalendar: React.FC = () => {
         description: task.description,
         priorityLevel: task.priorityLevel,
         timeFocus: task.timeFocus,
-        startDate: task.start ? new Date(task.start) : null,
-        endDate: task.end ? new Date(task.end) : null,
+        startDate: task.startDate,
+        endDate: task.endDate,
         status: task.status
       });
       if (task.status === "Completed" || task.status === "Expired") {
@@ -231,7 +220,11 @@ const TaskCalendar: React.FC = () => {
           initialView="dayGridMonth"
           editable={true}
           droppable={true}
-          events={tasks}
+          events={tasks.map((task) => ({
+            ...task,
+            start: task.startDate, // Map startDate to start
+            end: task.endDate,     // Map endDate to end
+          }))}
           eventContent={renderTaskContent}
           eventChange={changeTaskByDragging}
           eventClick={handleTimer}
