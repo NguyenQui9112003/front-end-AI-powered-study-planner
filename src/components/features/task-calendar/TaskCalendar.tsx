@@ -13,14 +13,25 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useRefreshToken } from "@/helpers/utility/refreshToken";
 
 import { Task } from "@/types/taskType";
-
+interface CTask {
+  _id?: number;
+  taskName: string;
+  description: string;
+  priorityLevel: string;
+  timeFocus: string;
+  start: Date | string | null;
+  end: Date | string | null;
+  status: string;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
 const TaskCalendar: React.FC = () => {
   const user = getTokenData().username;
   const navigate = useNavigate();
   const getRefreshToken = useRefreshToken();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedTask, setSelectedTask] = useState<null>(null);
+  const [tasks, setTasks] = useState<CTask[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [openTimerModal, setTimerOpenModal] = useState(false);
 
   const timerFormRef = useRef<{ submitForm: () => void } | null>(null);
@@ -58,13 +69,11 @@ const TaskCalendar: React.FC = () => {
 
       if (response.ok) { 
         const data = await response.json();
-        const mappedTasks = data.map((task: any) => ({
+        const mappedTasks = data.map((task: CTask) => ({
           _id: task._id,
           taskName: task.taskName,
-          start: task.startDate,
-          end: task.endDate,
-          startDate: task.startDate,
-          endDate: task.endDate,  
+          start: task.start,
+          end: task.end,
           timeFocus: task.timeFocus,
           status: task.status,
           description: task.description,
