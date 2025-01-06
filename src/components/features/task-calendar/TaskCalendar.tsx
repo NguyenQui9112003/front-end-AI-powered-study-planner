@@ -45,7 +45,7 @@ const TaskCalendar: React.FC = () => {
       const accessToken = parsedToken.access_token;
   
       const response = await fetch(
-        `http://localhost:3000/tasks?userName=${encodeURIComponent(user)}`,
+        `http://https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(user)}`,
         {
           method: "GET",
           headers: {
@@ -106,7 +106,7 @@ const TaskCalendar: React.FC = () => {
     const parsedToken = JSON.parse(token);
     const accessToken = parsedToken.access_token;
     try {
-      const response = await fetch("http://localhost:3000/tasks/update", {
+      const response = await fetch("http://https://be-ai-study-planner.onrender.com/tasks/update", {
         method: "POST",
         headers: { 
           Authorization: `Bearer ${accessToken}`,

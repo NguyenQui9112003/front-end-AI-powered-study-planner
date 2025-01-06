@@ -16,7 +16,7 @@ export const useGoogleLogin = () => {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             const idToken = await user.getIdToken();
-            let response = await fetch('http://localhost:3000/auth/google', {
+            let response = await fetch('http://https://be-ai-study-planner.onrender.com/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken })

@@ -53,7 +53,7 @@ export const AnalyzePage = () => {
 
 		try {
 			let response = await fetch(
-				`http://localhost:3000/tasks?userName=${encodeURIComponent(
+				`http://https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 				{
@@ -106,7 +106,7 @@ export const AnalyzePage = () => {
 			} else if (response.status === 419) {
 				accessToken = await getRefreshToken(refreshToken);
 				response = await fetch(
-					`http://localhost:3000/tasks?userName=${encodeURIComponent(
+					`http://https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(
 						user
 					)}`,
 					{

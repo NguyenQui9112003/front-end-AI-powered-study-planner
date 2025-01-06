@@ -15,7 +15,7 @@ const EmailVerificationModal = ({ show, onHide, email }: any) => {
     const sendOTPWithMail = async () => {
         console.log("send otppppppppp");
         try {
-            const response = await fetch("http://localhost:3000/auth/sendOTP", {
+            const response = await fetch("http://https://be-ai-study-planner.onrender.com/auth/sendOTP", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const EmailVerificationModal = ({ show, onHide, email }: any) => {
             if (rightOTP) {
                 console.log("OTP is correct", email);
 
-                const response = await fetch("http://localhost:3000/auth/verifyAccount", {
+                const response = await fetch("http://https://be-ai-study-planner.onrender.com/auth/verifyAccount", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

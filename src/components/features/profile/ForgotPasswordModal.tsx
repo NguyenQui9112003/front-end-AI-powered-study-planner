@@ -16,7 +16,7 @@ const ForgotPasswordModal = ({ show, onHide }: any) => {
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/auth/sendOTP", {
+            const response = await fetch("http://https://be-ai-study-planner.onrender.com/auth/sendOTP", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const ForgotPasswordModal = ({ show, onHide }: any) => {
     try {
       const token = JSON.parse(window.localStorage.getItem("token") || "{}");
       const response = await fetch(
-        "http://localhost:3000/auth/createPassword",
+        "http://https://be-ai-study-planner.onrender.com/auth/createPassword",
         {
           method: "POST",
           headers: {

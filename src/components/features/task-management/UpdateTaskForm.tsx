@@ -63,7 +63,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 			const refreshToken = parsedToken.refresh_token;
 
 			try {
-				let response = await fetch('http://localhost:3000/tasks/update',
+				let response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/update',
 					{
 						method: 'POST',
 						headers: {
@@ -80,7 +80,7 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 					});
 				} else if (response.status === 419) {
 					accessToken = await getRefreshToken(refreshToken);
-					response = await fetch('http://localhost:3000/tasks/update',
+					response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/update',
 						{
 							method: 'POST',
 							headers: {

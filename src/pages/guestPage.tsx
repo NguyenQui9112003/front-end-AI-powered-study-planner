@@ -2,7 +2,7 @@ import "../css/calendar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // import { useState } from "react";
-import { useNavigate, NavLink } from 'react-router-dom';
+import {NavLink } from 'react-router-dom';
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -13,7 +13,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Footer } from '../layouts/footer';
 
 export const GuestPage = () => {
-    const navigate = useNavigate();
     return (
         <>
             <nav className="bg-blue-600">

@@ -31,7 +31,7 @@ export const ProfilePage = () => {
       const refreshToken = parsedToken.refresh_token;
 
       try {
-        let response = await fetch("http://localhost:3000/auth/profile", {
+        let response = await fetch("http://https://be-ai-study-planner.onrender.com/auth/profile", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -49,7 +49,7 @@ export const ProfilePage = () => {
         } else if (response.status === 419) {
           accessToken = await getRefreshToken(refreshToken);
           if (accessToken) {
-            response = await fetch("http://localhost:3000/auth/profile", {
+            response = await fetch("http://https://be-ai-study-planner.onrender.com/auth/profile", {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -102,7 +102,7 @@ export const ProfilePage = () => {
     try {
       const token = JSON.parse(window.localStorage.getItem("token") || "{}");
       const response = await fetch(
-        "http://localhost:3000/auth/changePassword",
+        "http://https://be-ai-study-planner.onrender.com/auth/changePassword",
         {
           method: "POST",
           headers: {
@@ -150,7 +150,7 @@ export const ProfilePage = () => {
     try {
       const token = JSON.parse(window.localStorage.getItem("token") || "{}");
       const response = await fetch(
-        "http://localhost:3000/auth/createPassword",
+        "http://https://be-ai-study-planner.onrender.com/auth/createPassword",
         {
           method: "POST",
           headers: {

@@ -123,7 +123,7 @@ export const TaskManagementPage = () => {
 		const refreshToken = parsedToken.refresh_token;
 
 		try {
-			let response = await fetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
+			let response = await fetch(`http://https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 				{
@@ -141,7 +141,7 @@ export const TaskManagementPage = () => {
 				setProcessedData(data);
 			} else if (response.status === 419) {
 				accessToken = await getRefreshToken(refreshToken);
-				response = await fetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
+				response = await fetch(`http://https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 					{
@@ -182,7 +182,7 @@ export const TaskManagementPage = () => {
 		const refreshToken = parsedToken.refresh_token;
 
 		try {
-			let response = await fetch('http://localhost:3000/tasks/delete', {
+			let response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/delete', {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${accessToken}`,
@@ -195,7 +195,7 @@ export const TaskManagementPage = () => {
 				fetchTasks();
 			} else if (response.status === 419) {
 				accessToken = await getRefreshToken(refreshToken);
-				response = await fetch('http://localhost:3000/tasks/delete', {
+				response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/delete', {
 					method: 'POST',
 					headers: {
 						Authorization: `Bearer ${accessToken}`,
