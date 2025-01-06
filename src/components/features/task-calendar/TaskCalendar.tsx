@@ -20,7 +20,7 @@ const TaskCalendar: React.FC = () => {
   const getRefreshToken = useRefreshToken();
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<null>(null);
   const [openTimerModal, setTimerOpenModal] = useState(false);
 
   const timerFormRef = useRef<{ submitForm: () => void } | null>(null);
@@ -58,7 +58,7 @@ const TaskCalendar: React.FC = () => {
 
       if (response.ok) { 
         const data = await response.json();
-        const mappedTasks = data.map((task: Task) => ({
+        const mappedTasks = data.map((task: any) => ({
           _id: task._id,
           taskName: task.taskName,
           start: task.startDate,
