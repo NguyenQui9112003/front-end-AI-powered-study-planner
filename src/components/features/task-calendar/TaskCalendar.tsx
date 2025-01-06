@@ -10,13 +10,15 @@ import { TimerForm } from "../task-management/TimerForm";
 import { Modal } from "../../common/modal";
 import "../../../css/calendar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useRefreshToken } from "@/helpers/utility/refreshToken";
 
 import { Task } from "@/types/taskType";
 
 const TaskCalendar: React.FC = () => {
   const user = getTokenData().username;
   const navigate = useNavigate();
-  
+  const getRefreshToken = useRefreshToken();
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [openTimerModal, setTimerOpenModal] = useState(false);
@@ -36,15 +38,14 @@ const TaskCalendar: React.FC = () => {
     try {
       const token = window.localStorage.getItem("token");
       if (!token) {
-        alert("No token found. Redirecting to sign-in...");
         navigate("/signIn");
         return;
       }
-  
       const parsedToken = JSON.parse(token);
-      const accessToken = parsedToken.access_token;
-  
-      const response = await fetch(
+      let accessToken = parsedToken.access_token;
+      const refreshToken = parsedToken.refresh_token;
+
+      let response = await fetch(
         `https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(user)}`,
         {
           method: "GET",
@@ -54,31 +55,51 @@ const TaskCalendar: React.FC = () => {
           },
         }
       );
-  
+
+      if (response.ok) { 
+        const data = await response.json();
+        const mappedTasks = data.map((task: Task) => ({
+          _id: task._id,
+          taskName: task.taskName,
+          start: task.startDate,
+          end: task.endDate,
+          status: task.status,
+          description: task.description,
+          priorityLevel: task.priorityLevel,
+        }));
+        setTasks(mappedTasks);
+      } else if (response.status === 419) {
+        accessToken = await getRefreshToken(refreshToken);
+        response = await fetch(
+          `https://be-ai-study-planner.onrender.com/tasks?userName=${encodeURIComponent(user)}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          console.log("Load schedule success")
+        } else {
+          navigate("/signIn");
+          alert("Session auth expired");
+        }
+      }
       if (!response.ok) {
         // Navigate to sign-in page on authorization failure
         alert("Session expired. Please log in again.");
         navigate("/signIn");
         return;
       }
-  
-      const data = await response.json();
-      const mappedTasks = data.map((task: Task) => ({
-        _id: task._id,
-        taskName: task.taskName,
-        start: task.startDate,
-        end: task.endDate,
-        status: task.status,
-        description: task.description,
-        priorityLevel: task.priorityLevel,
-      }));
-      setTasks(mappedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       alert("An error occurred while fetching tasks. Please try again.");
     }
   };
-  
+
 
   useEffect(() => {
     loadTasks();
@@ -104,16 +125,39 @@ const TaskCalendar: React.FC = () => {
     }
 
     const parsedToken = JSON.parse(token);
-    const accessToken = parsedToken.access_token;
+    let accessToken = parsedToken.access_token;
+    const refreshToken = parsedToken.refresh_token;
+
     try {
-      const response = await fetch("https://be-ai-study-planner.onrender.com/tasks/update", {
+      let response = await fetch("https://be-ai-study-planner.onrender.com/tasks/update", {
         method: "POST",
-        headers: { 
+        headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json" 
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(data),
       });
+
+      if (response.ok) {
+        alert("Focus time end");
+      } else if (response.status === 419) {
+        accessToken = await getRefreshToken(refreshToken);
+        response = await fetch('https://be-ai-study-planner.onrender.com/tasks/update', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify(data),
+        })
+
+        if (response.ok) {
+          alert("Focus time end");
+        } else {
+          navigate("/signIn");
+          alert("Session auth expired");
+        }
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
