@@ -1,12 +1,13 @@
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useRefreshToken } from "../../../helpers/utility/refreshToken";
 
 import { Task } from '@/types/taskType';
 import { adjustToUTC7 } from '@/helpers/utility/timezone';
 import { authFetch } from '@/helpers/utility/authFetch';
-import { useNavigate } from 'react-router-dom';
 
 type UpdateTaskFormProps = {
 	defaultValues: Task;
@@ -50,40 +51,46 @@ export const UpdateTaskForm = forwardRef<any, UpdateTaskFormProps>(
 			submitForm: () => handleSubmit(onSubmit)(),
 		}));
 
-		const onSubmit: SubmitHandler<Inputs> = async (data) => {
-			data.username = user;
-			try {
-				const response = await authFetch('http://localhost:3000/tasks/update',
-					{
-						method: 'POST',
-						headers: {
-							'Content-type': 'application/json',
-						},
-						body: JSON.stringify(data),
+	const onSubmit: SubmitHandler<Inputs> = async (data) => {
+		try {
+			const response = await authFetch(
+				'http://localhost:3000/tasks/update',
+				{
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/json',
 					},
-					navigate
-				);
+					body: JSON.stringify(data),
+				},
+				navigate
+			);
 
-				if (!response.ok) {
-					const errorData = await response.json();
-					throw new Error(errorData.message || 'Server error');
-				} else {
-					toast.success('Task updated successfully', {
-						position: 'top-right',
-					});
-				}
-			} catch (error) {
-				if (error instanceof Error) {
-					toast.error(error.message, {
-						position: 'top-right',
-					});
-				} else {
-					toast.error('Server: An unexpected error occurred.', {
-						position: 'top-right',
-					});
-				}
+			if (!response) {
+				toast.error('Update failed. Try again later', {
+					position: 'top-right',
+				});
 			}
-		};
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || 'Server error');
+			} else {
+				toast.success('Task updated successfully', {
+					position: 'top-right',
+				});
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message, {
+					position: 'top-right',
+				});
+			} else {
+				toast.error('Server: An unexpected error occurred.', {
+					position: 'top-right',
+				});
+			}
+		}
+	};
 
 		return (
 			<>

@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CreateTaskForm = forwardRef(({ user }: any, ref) => {
+    const navigate = useNavigate();
+    
     type Inputs = {
         username: string;
         taskName: string;
@@ -17,8 +19,6 @@ export const CreateTaskForm = forwardRef(({ user }: any, ref) => {
         endDate: Date | null;
         status: string;
     }
-
-    const navigate = useNavigate();
 
     const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful }, } = useForm<Inputs>({})
 

@@ -18,176 +18,206 @@ import { authFetch } from '@/helpers/utility/authFetch';
 import { useNavigate } from 'react-router-dom';
 
 const TaskCalendar: React.FC = () => {
-	const user = getTokenData().username;
+  const user = getTokenData().username;
+  const navigate = useNavigate();
+  
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [openTimerModal, setTimerOpenModal] = useState(false);
 
-	const [tasks, setTasks] = useState<Task[]>([]);
-	const [selectedTask, setSelectedTask] = useState<Task | null>(null); // State for selected task
-	const [showTimerForm, setShowTimerForm] = useState(false); // State for modal visibility
-	const [show, setShow] = useState(false);
+  const timerFormRef = useRef<{ submitForm: () => void } | null>(null);
+  const defaultValues = selectedTask || {
+    taskName: "",
+    description: "",
+    timeFocus: "0",
+    priorityLevel: "",
+    startDate: null,
+    endDate: null,
+    status: "",
+  };
 
-	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
+  const loadTasks = async () => {
+    try {
+      const token = window.localStorage.getItem("token");
+      if (!token) {
+        alert("No token found. Redirecting to sign-in...");
+        navigate("/signIn");
+        return;
+      }
+  
+      const parsedToken = JSON.parse(token);
+      const accessToken = parsedToken.access_token;
+  
+      const response = await fetch(
+        `http://localhost:3000/tasks?userName=${encodeURIComponent(user)}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        // Navigate to sign-in page on authorization failure
+        alert("Session expired. Please log in again.");
+        navigate("/signIn");
+        return;
+      }
+  
+      const data = await response.json();
+      const mappedTasks = data.map((task: Task) => ({
+        _id: task._id,
+        taskName: task.taskName,
+        start: task.startDate,
+        end: task.endDate,
+        status: task.status,
+        description: task.description,
+        priorityLevel: task.priorityLevel,
+      }));
+      setTasks(mappedTasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      alert("An error occurred while fetching tasks. Please try again.");
+    }
+  };
+  
 
-	const navigate = useNavigate();
+  useEffect(() => {
+    loadTasks();
+  }, [user]);
 
-	const timerFormRef = useRef<any>(null);
+  const renderTaskContent = (taskInfo: any) => {
+    const isExpired =
+      new Date(taskInfo.event.end || taskInfo.event.start) < new Date();
+    return (
+      <div className={`task-item ${isExpired ? "expired" : "todo"}`}>
+        {taskInfo.event.extendedProps.taskName} <br />
+        {taskInfo.event.extendedProps.status}
+      </div>
+    );
+  };
 
-	useEffect(() => {
-		const loadTasks = async () => {
-			try {
-				const response = await authFetch(
-					`http://localhost:3000/tasks?userName=${encodeURIComponent(
-						user
-					)}`,
-					{
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-					},
-					navigate
-				);
+  const updateTask = async (data: any) => {
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      alert("No token found. Redirecting to sign-in...");
+      navigate("/signIn");
+      return;
+    }
 
-				if (!response.ok) {
-					throw new Error(`Error: ${response.statusText}`);
-				}
-
-				const data = await response.json();
-				// console.log(data);
-				const mappedTasks = data.map((task: Task) => ({
-					_id: task._id,
-					title: task.taskName,
-					start: task.startDate,
-					end: task.endDate,
-					status: task.status,
-					description: task.description,
-					priorityLevel: task.priorityLevel,
-				}));
-				// console.log(mappedTasks);
-				setTasks(mappedTasks);
-			} catch (error) {
-				console.error('Error fetching tasks:', error);
-			}
-		};
-
-		loadTasks();
-	}, [user]);
-
-	// Customize task content rendering
-	const renderTaskContent = (taskInfo: any) => {
-		// console.log("renderTaskContent");
-		// console.log(JSON.stringify(taskInfo.event, null, 2));
-		const isExpired =
-			new Date(taskInfo.event.end || taskInfo.event.start) < new Date();
-		return (
-			<div className={`task-item ${isExpired ? 'expired' : 'todo'}`}>
-				{taskInfo.event.title} <br />
-				{isExpired ? 'EXPIRED' : 'TODO'}
-			</div>
-		);
-	};
-	const updateTask = async (data: any) => {
-		try {
-			const response = await authFetch(
-				'http://localhost:3000/tasks/update',
-				{
-					method: 'POST',
-					headers: {
-						'Content-type': 'application/json',
-					},
-					body: JSON.stringify(data),
-				},
-				navigate
-			);
+    const parsedToken = JSON.parse(token);
+    const accessToken = parsedToken.access_token;
+    try {
+      const response = await fetch("http://localhost:3000/tasks/update", {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify(data),
+      });
 
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.message || 'Server error');
 			}
 
-			console.log('Task updated successfully');
-		} catch (error) {
-			if (error instanceof Error) {
-				console.error(error.message, {
-					position: 'top-right',
-				});
-			} else {
-				console.error('Server: An unexpected error occurred.', {
-					position: 'top-right',
-				});
-			}
-		}
-	};
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : "Unexpected error");
+    }
+  };
 
-	const changeTaskByDragging = async (events: any) => {
-		const data = {
-			username: user,
-			taskName: events.event.title,
-			startDate: events.event.start,
-			endDate: events.event.end,
-		};
+  const changeTaskByDragging = async (events: any) => {
+    const data = {
+      username: user,
+      taskName: events.event.extendedProps.taskName,
+      startDate: events.event.start,
+      endDate: events.event.end,
+    };
 
-		// console.log("Changed", JSON.stringify(data, null, 2));
+    await updateTask(data);
+  };
 
-		await updateTask(data);
-	};
+  const handleTimer = (eventInfo: any) => {
+    const task = tasks.find((t) => t._id === eventInfo.event.extendedProps._id);
+    if (task) {
+      setSelectedTask(task);
+      setTimerOpenModal(true);
+    }
+  };
 
-	const handleTimer = (eventInfo: any) => {
-		console.log(JSON.stringify(eventInfo.event, null, 2));
-		const task = tasks.find(
-			(t) => t._id === eventInfo.event.extendedProps._id
-		);
-		if (task) {
-			setSelectedTask(task);
-			console.log('CLICKED');
-			setShowTimerForm(true); // Show TimerForm
-			handleShow();
-		}
-	};
+  const handleCloseModal = () => {
+    setTimerOpenModal(false);
+    setSelectedTask(null);
+  };
 
-	const closeTimerForm = () => {
-		setShowTimerForm(false); // Close TimerForm
-		setSelectedTask(null);
-	};
 
-	return (
-		<div className="calendar-container">
-			<FullCalendar
-				plugins={[
-					dayGridPlugin,
-					interactionPlugin,
-					listPlugin,
-					timeGridPlugin,
-				]}
-				initialView="dayGridMonth"
-				editable={true}
-				droppable={true}
-				events={tasks}
-				eventContent={renderTaskContent}
-				eventChange={changeTaskByDragging}
-				eventClick={handleTimer}
-				headerToolbar={{
-					left: 'prev,next today',
-					center: 'title',
-					right: 'dayGridMonth,timeGridWeek,timeGridDay',
-				}}
-				footerToolbar={{
-					left: '',
-					center: '',
-					right: 'prevYear,nextYear',
-				}}
-			/>
+  const handleSession = () => {
+    if (timerFormRef.current) {
+      timerFormRef.current.submitForm();
+      loadTasks();
+    }
+    setTimerOpenModal(false); // Close the modal
+  };
 
-			<Modal show={show} onHide={handleClose}>
-				<Modal.Header closeButton={true}>
-					<Modal.Title>Focus Timer</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<TimerForm defaultValues={selectedTask} user={user} />
-				</Modal.Body>
-			</Modal>
-		</div>
-	);
+  return (
+    <div className="calendar-container p-4 min-h-screen">
+      <div className="bg-white shadow-md rounded-lg p-4">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin, listPlugin, timeGridPlugin]}
+          initialView="dayGridMonth"
+          editable={true}
+          droppable={true}
+          events={tasks}
+          eventContent={renderTaskContent}
+          eventChange={changeTaskByDragging}
+          eventClick={handleTimer}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          footerToolbar={{
+            left: "",
+            center: "",
+            right: "prevYear,nextYear",
+          }}
+          height="auto"
+          contentHeight="auto"
+        />
+      </div>
+
+      <Modal isOpen={openTimerModal} onClose={handleCloseModal}>
+        <Modal.Header>
+          <div className="text-blue-500 font-bold text-2xl mb-3 text-center">
+            Timer
+          </div>
+        </Modal.Header>
+        <Modal.Body>
+          <TimerForm
+            ref={timerFormRef}
+            defaultValues={defaultValues}
+            user={user}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="flex justify-end mt-3">
+            <Modal.DismissButton className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-1">
+              Close
+            </Modal.DismissButton>
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mx-1"
+              onClick={handleSession}
+            >
+              End
+            </button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
 };
 
 export default TaskCalendar;

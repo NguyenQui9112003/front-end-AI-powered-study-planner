@@ -25,6 +25,7 @@ const PrivateRoute = ({ element }: PrivateRouteProps) => {
     }
 
     return <>{element}</>;
+    return <>{element}</>;
 };
 
 export default PrivateRoute;

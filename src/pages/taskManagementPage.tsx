@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import dayjs from 'dayjs';
 import { useRef, useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import dayjs from 'dayjs';
+import { useNavigate } from "react-router-dom";
+
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Task } from '@/types/taskType.tsx';
@@ -15,14 +17,14 @@ import Header from '../layouts/header.tsx';
 // import { TimerForm } from '@/components/features/task-management/TimerForm.tsx';
 import { CreateTaskForm } from '../components/features/task-management/CreateTaskForm.tsx';
 import { UpdateTaskForm } from '../components/features/task-management/UpdateTaskForm.tsx';
-
 import { AISuggestion } from '@/components/features/ai/AISuggestion.tsx';
-import { useNavigate } from 'react-router-dom';
+
 import { AuthError, authFetch } from '@/helpers/utility/authFetch.ts';
 
 export const TaskManagementPage = () => {
-	const user = getTokenData().username;
 	const navigate = useNavigate();
+	const getRefreshToken = useRefreshToken();
+	const user = getTokenData().username;
 
 	const [dataFetch, setDataFetch] = useState<Task[]>([]);
 	const [currentTask, setCurrentTask] = useState<Task | null>(null);
@@ -111,39 +113,53 @@ export const TaskManagementPage = () => {
 	}, []);
 
 	const fetchTasks = async () => {
+		const token = window.localStorage.getItem("token");
+		if (!token) {
+			navigate("/signIn");
+			return;
+		}
+		const parsedToken = JSON.parse(token);
+		let accessToken = parsedToken.access_token;
+		const refreshToken = parsedToken.refresh_token;
+
 		try {
-			const response = await authFetch(
-				`http://localhost:3000/tasks?userName=${encodeURIComponent(
+			let response = await authFetch(`http://localhost:3000/tasks?userName=${encodeURIComponent(
 					user
 				)}`,
 				{
 					method: 'GET',
 					headers: {
+						Authorization: `Bearer ${accessToken}`,
 						'Content-type': 'application/json',
 					},
-				}
+				}, navigate
 			);
 
-			if (!response.ok) {
-				throw new Error(`Error: ${response.statusText}`);
-			}
 
-			const data = await response.json();
-			setDataFetch(data);
-			setProcessedData(data);
+				const data = await response.json();
+				setDataFetch(data);
+				applyFilterSortSearch(data);
+			
 		} catch (error) {
-			if (error instanceof AuthError) {
-				navigate("/signIn");
-			}
 			console.error('Error fetching profile:', error);
 		}
 	};
 
 	const deleteTask = async (taskName: string) => {
+		const token = window.localStorage.getItem("token");
+		if (!token) {
+			navigate("/signIn");
+			return;
+		}
+		const parsedToken = JSON.parse(token);
+		let accessToken = parsedToken.access_token;
+		const refreshToken = parsedToken.refresh_token;
+
 		try {
 			const response = await authFetch('http://localhost:3000/tasks/delete', {
 				method: 'POST',
 				headers: {
+					Authorization: `Bearer ${accessToken}`,
 					'Content-type': 'application/json',
 				},
 				body: JSON.stringify({ username: user, taskName }),
@@ -152,16 +168,11 @@ export const TaskManagementPage = () => {
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.message || 'Server error');
-			} else {
-				fetchTasks();
 			}
 
 		} catch (error) {
 			console.error("Server: Failed request.");
-			if (error instanceof AuthError) {
-				navigate("/signIn");
-			}
-			else if (error instanceof Error) {
+			if (error instanceof Error) {
 				toast.error(error.message, {
 					position: 'top-right',
 				});

@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../../../css/profile.css";
 import bcrypt from 'bcryptjs';
 
-const ForgotPasswordModal = ({ show, onHide }) => {
+const ForgotPasswordModal = ({ show, onHide }: any) => {
     const [step, setStep] = useState(1); // Step 1: Email input, Step 2: OTP input
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState({from_mail: "", entered: ""});
@@ -175,7 +175,6 @@ const ForgotPasswordModal = ({ show, onHide }) => {
                             name="new"
                             placeholder="Enter your new password"
                             required={true}
-                            onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </Form.Group>
                     <Form.Group className="mb-4">
@@ -185,7 +184,6 @@ const ForgotPasswordModal = ({ show, onHide }) => {
                             name="confirm"
                             placeholder="Confirm your new password"
                             required={true}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                     </Form.Group>
                     {error && <div className="text-danger">{error}</div>}

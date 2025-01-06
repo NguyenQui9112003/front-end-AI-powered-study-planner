@@ -81,8 +81,7 @@ export const authFetch = async (
 			response = await fetch(url, request);
 
 			if (!response.ok) {
-				toLogin();
-				throw new AuthError('Request fail: ' + response);
+				throw new Error('Request fail: ' + response);
 			}
 
 			return response;

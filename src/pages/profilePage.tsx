@@ -17,6 +17,7 @@ export const ProfilePage = () => {
     hasPassword: true,
   });
   const [showModal, setShowModal] = useState(false);
+
 // GET PROFILE INFORMATION
   useEffect(() => {
     const fetchProfile = async () => {
@@ -65,6 +66,7 @@ export const ProfilePage = () => {
               });
             } else {
               navigate("/signIn");
+              alert("Session auth expired");
             }
           }
         } else {
@@ -197,7 +199,7 @@ export const ProfilePage = () => {
                   <img
                     src="/assets/user.png"
                     alt="Avatar"
-                    className="rounded-circle p-1 bg-primary"
+                    className="rounded-circle p-1 bg-blue-600"
                     width="110"
                   />
                   <div className="mt-3">
@@ -237,8 +239,7 @@ export const ProfilePage = () => {
                   <Col sm={6} className="d-flex justify-content-end">
                     {!profile.isActive && (
                       <Button
-                        variant="primary"
-                        className="px-4"
+                        className="px-4 bg-blue-600"
                         onClick={handleShowModal}
                       >
                         Activate Account
@@ -301,7 +302,7 @@ export const ProfilePage = () => {
                   </Form.Group>
                   <Row>
                     <Col className="d-flex justify-content-end">
-                      <Button type="submit" variant="primary">
+                      <Button type="submit"  className="bg-blue-600">
                         &nbsp; Submit &nbsp;
                       </Button>
                     </Col>

@@ -101,7 +101,9 @@ const AnalyzePage = () => {
 				<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 					<Card>
 						<CardHeader>
-							<CardTitle>Task Summary</CardTitle>
+							<div className='pl-7'>
+								<CardTitle>Task Summary</CardTitle>
+							</div>
 						</CardHeader>
 						<CardContent>
 							<ul className="space-y-2 p-0 text-center mx-auto">
@@ -135,7 +137,9 @@ const AnalyzePage = () => {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Focus Session Stats</CardTitle>
+							<div className='pl-7'>
+								<CardTitle>Focus Session Stats</CardTitle>
+							</div>
 						</CardHeader>
 						<CardContent>
 							<ul className="space-y-2 p-0">
@@ -148,19 +152,20 @@ const AnalyzePage = () => {
 								<li>
 									Avg Session Time:{' '}
 									<span className="font-bold">
-										{stats.avgSessionDuration} mins
+										{data.avgSessionDuration} mins
 									</span>
 								</li>
 								<li>
-									Task Completion Rate:{' '}
+									Avg Break Duration:{' '}
 									<span className="font-bold">
-										{stats.taskCompletionRate} %
+										{data.avgBreakTime} mins
 									</span>
 								</li>
 							</ul>
 						</CardContent>
 					</Card>
-				</div>
+
+	
 
 				<Card className="mb-8">
 					<CardHeader>
@@ -258,6 +263,7 @@ const AnalyzePage = () => {
 						</CardContent>
 					</Card>
 				</div>
+			</div>
 			</div>
 		</>
 	);

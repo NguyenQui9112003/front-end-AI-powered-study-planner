@@ -26,9 +26,9 @@ export const Header = () => {
                 <div className="mx-auto max-w-full px-2 sm:px-6 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
                         <div className="flex flex-1 items-center justify-start">
-                            <span className="flex shrink-0 items-center">
+                            <span className="ml-3 flex shrink-0 items-center">
                                 <img
-                                    className="h-8 w-auto"
+                                    className="h-10 w-auto"
                                     src="..\assets\ailogo.png"
                                     alt="Logo"/>
                             </span>
@@ -40,7 +40,7 @@ export const Header = () => {
                                         className={({ isActive }) =>
                                             isActive
                                                 ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"}
+                                                : "rounded-md px-3 py-2 text-sm font-medium hover:text-black  text-white hover:bg-white "}
                                         aria-current="page">
                                         Home
                                     </NavLink>
@@ -49,7 +49,7 @@ export const Header = () => {
                                         className={({ isActive }) =>
                                             isActive
                                                 ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"}>
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black "}>
                                         Task Management
                                     </NavLink>
                                     <NavLink
@@ -57,7 +57,7 @@ export const Header = () => {
                                         className={({ isActive }) =>
                                             isActive
                                                 ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"}>
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black  "}>
                                         Analyze
                                     </NavLink>
                                 </div>
@@ -77,7 +77,7 @@ export const Header = () => {
                                     >
                                         <span className="sr-only">Open user menu</span>
                                         <img
-                                            className="h-8 w-8"
+                                            className="h-8 w-8 border-2 border-white rounded-full"
                                             src="../../assets/user.png"
                                             alt="avatar"
                                         />
