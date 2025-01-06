@@ -1,7 +1,7 @@
 import "../css/calendar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { useState } from "react";
+// import { useState } from "react";
 import { useNavigate, NavLink } from 'react-router-dom';
 
 import FullCalendar from "@fullcalendar/react";
@@ -14,15 +14,6 @@ import { Footer } from '../layouts/footer';
 
 export const GuestPage = () => {
     const navigate = useNavigate();
-
-    const signInClick = () => {
-        navigate(`/signIn`);
-    };
-
-    const registerClick = () => {
-        navigate(`/register`);
-    };
-
     return (
         <>
             <nav className="bg-blue-600">

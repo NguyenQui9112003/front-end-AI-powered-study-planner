@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRefreshToken } from "../../../helpers/utility/refreshToken";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
@@ -17,7 +16,6 @@ import { Task } from "@/types/taskType";
 const TaskCalendar: React.FC = () => {
   const user = getTokenData().username;
   const navigate = useNavigate();
-  const getRefreshToken = useRefreshToken();
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -184,7 +182,6 @@ const TaskCalendar: React.FC = () => {
           }}
           height="auto"
           contentHeight="auto"
-          className="custom-calendar"
         />
       </div>
 
