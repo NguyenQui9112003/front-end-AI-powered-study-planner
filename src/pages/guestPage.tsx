@@ -32,8 +32,8 @@ export const GuestPage = () => {
                                         to="/guest"
                                         className={({ isActive }) =>
                                             isActive
-                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"}
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black  text-decoration-none "
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-decoration-none  text-white hover:bg-blue-400"}
                                         aria-current="page">
                                         Home
                                     </NavLink>
@@ -45,13 +45,13 @@ export const GuestPage = () => {
                             <div className="ml-7 flex space-x-4">
                                 <NavLink
                                     to="/signIn"
-                                    className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    className="rounded-md px-3 py-2 text-sm font-medium text-decoration-none  text-white hover:bg-blue-400"
                                     aria-current="page">
                                     SignIn
                                 </NavLink>
                                 <NavLink
                                     to="/register"
-                                    className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black"
+                                    className="rounded-md px-3 py-2 text-sm font-medium text-decoration-none  text-white hover:bg-blue-400"
                                     aria-current="page">
                                     Register
                                 </NavLink>                            </div>
