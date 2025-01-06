@@ -63,6 +63,8 @@ const TaskCalendar: React.FC = () => {
           taskName: task.taskName,
           start: task.startDate,
           end: task.endDate,
+          startDate: task.startDate,
+          endDate: task.endDate,  
           timeFocus: task.timeFocus,
           status: task.status,
           description: task.description,
