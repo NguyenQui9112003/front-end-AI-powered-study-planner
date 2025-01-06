@@ -47,7 +47,7 @@ export const CreateTaskForm = forwardRef(({ user }: any, ref) => {
 
 
         try {
-            let response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/create', {
+            let response = await fetch('https://be-ai-study-planner.onrender.com/tasks/create', {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -62,7 +62,7 @@ export const CreateTaskForm = forwardRef(({ user }: any, ref) => {
                 });
             } else if (response.status === 419) {
                 accessToken = await getRefreshToken(refreshToken);
-                response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/create', {
+                response = await fetch('https://be-ai-study-planner.onrender.com/tasks/create', {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${accessToken}`,

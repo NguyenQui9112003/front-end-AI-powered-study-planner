@@ -36,7 +36,7 @@ export const AISuggestion = (props: AISuggestionProps) => {
 
 		console.log(tasks);
 
-		const response = await authFetch('http://https://be-ai-study-planner.onrender.com/ai/schedule', {
+		const response = await authFetch('https://be-ai-study-planner.onrender.com/ai/schedule', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

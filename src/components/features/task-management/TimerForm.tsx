@@ -62,7 +62,7 @@ export const TimerForm = forwardRef<any, FocusTimeProps>(
             };
             
             try {
-                const response = await fetch('http://https://be-ai-study-planner.onrender.com/tasks/update-focus-time', {
+                const response = await fetch('https://be-ai-study-planner.onrender.com/tasks/update-focus-time', {
                     method: 'POST',
                     headers: {
                         'Content-type': 'application/json'

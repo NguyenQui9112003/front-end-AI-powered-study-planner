@@ -31,7 +31,7 @@ export const RegisterForm = () => {
                 username: data.username,
                 password: data.password
             }
-            const response = await fetch('http://https://be-ai-study-planner.onrender.com/auth/register', {
+            const response = await fetch('https://be-ai-study-planner.onrender.com/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'

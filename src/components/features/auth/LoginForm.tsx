@@ -34,7 +34,7 @@ export const LoginForm = () => {
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            const response = await fetch('http://https://be-ai-study-planner.onrender.com/auth/login', {
+            const response = await fetch('https://be-ai-study-planner.onrender.com/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
