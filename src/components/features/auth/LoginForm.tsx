@@ -111,18 +111,17 @@ export const LoginForm = () => {
                     <div className="mt-3">
                         <div className="flex items-center justify-between">
                             <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 ml-4 rounded focus:outline-none focus:shadow-outline"
                                 type="submit"
                             >
                                 Sign In
                             </button>
-                            <a
-                                className="inline-block align-baseline font-italic text-sm text-blue-300 hover:text-blue-700 hover:underline mx-auto"
-                                style={{ cursor: 'pointer' }}
-                                onClick={navigateToRegister}
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 mr-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button" onClick={navigateToRegister}
                             >
-                                Register account?
-                            </a>
+                                Register
+                            </button>
                         </div>
                         <div className="mt-2 text-center">
                             <a

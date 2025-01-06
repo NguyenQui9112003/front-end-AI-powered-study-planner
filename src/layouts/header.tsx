@@ -39,8 +39,8 @@ export const Header = () => {
                                         to="/home"
                                         className={({ isActive }) =>
                                             isActive
-                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium hover:text-black  text-white hover:bg-white "}
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black text-decoration-none"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-decoration-none  text-white hover:bg-blue-400 "}
                                         aria-current="page">
                                         Home
                                     </NavLink>
@@ -48,16 +48,16 @@ export const Header = () => {
                                         to="/task-management"
                                         className={({ isActive }) =>
                                             isActive
-                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black "}>
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black text-decoration-none"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-400 text-decoration-none "}>
                                         Task Management
                                     </NavLink>
                                     <NavLink
                                         to="/analyze"
                                         className={({ isActive }) =>
                                             isActive
-                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black"
-                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white hover:text-black  "}>
+                                                ? "rounded-md bg-white px-3 py-2 text-sm font-medium text-black text-decoration-none"
+                                                : "rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-400 text-decoration-none  "}>
                                         Analyze
                                     </NavLink>
                                 </div>
